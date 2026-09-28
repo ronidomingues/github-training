@@ -1,0 +1,736 @@
+% ======================================================================
+% CONTEÚDO DOS SLIDES — Capacitação de Git e GitHub (120 minutos)
+% ----------------------------------------------------------------------
+% Cada frame tem \note{} com o roteiro de fala e o relógio acumulado.
+% Compile apresentacao_notes.tex para vê-las na segunda tela.
+% ======================================================================
+
+% ============================ CITAÇÃO ==================================
+\begin{frame}[plain]{\tit{Uma breve citação para começar}}
+  \vspace{3em}
+  \begin{center}
+    \lexendlight
+    \textcolor{white}{\Large
+      “Isso aqui vai ser uma \textcolor{yellow}{palestra} de
+      \textcolor{lightpurple}{GitHub intermediário}.”}
+
+    \vspace{1em}
+    \textcolor{lightpurple}{\small — Um sábio contemporâneo (2025)}
+  \end{center}
+  \vfill
+  \begin{flushright}
+    \textcolor{lightpurple}{\scriptsize *Paráfrase livre de uma lenda que se foi...*}
+  \end{flushright}
+
+  \note{
+    \textbf{00:00 — antes de começar}\\[.5em]
+    Deixe este slide na tela enquanto a turma chega. Ele quebra o gelo sozinho.
+  }
+\end{frame}
+
+% ============================ CAPA ====================================
+\begin{frame}[plain]
+  \vspace{2em}
+  \includegraphics[width=0.18\linewidth]{./assets/logos/for_code_para_fundo_escuro.png}
+
+  \vfill
+  \begin{center}
+    {\usebeamerfont{title}\inserttitle}
+
+    \vspace{0.8em}
+    {\lexendlight\textcolor{white}{\large Do primeiro commit à automação}}
+
+    \vspace{1.5em}
+    {\textcolor{lightpurple}{\insertauthor\ – \insertdate}}
+  \end{center}
+
+  \vfill
+  \begin{flushright}
+    \textcolor{lightpurple}{\rule{0.3\linewidth}{3pt}}
+  \end{flushright}
+
+  \note{
+    \textbf{00:00 — Abertura (5 min para o bloco todo)}\\[.5em]
+    Boas-vindas. \textbf{Faça agora:} peça para todo mundo abrir o navegador
+    em github.com e entrar na conta, ou criar uma. É o que mais atrasa o
+    bloco 1.
+  }
+\end{frame}
+
+% ======================== APRESENTAÇÃO DO MINISTRANTE ==================
+\begin{frame}[plain]
+  \vspace{0.5em}
+  \begin{center}
+    {\fontsize{22}{26}\selectfont \tit{Apresentação}}
+
+    \vspace{1.2em}
+    \begin{tikzpicture}
+      \begin{scope}
+        \clip (0,0) circle (1.7cm);
+        \node at (0,0) {\includegraphics[width=3.6cm]{./assets/images/roni.jpeg}};
+      \end{scope}
+      \draw[lightpurple, line width=2.5pt] (0,0) circle (1.7cm);
+    \end{tikzpicture}
+
+    \vspace{1em}
+    {\fontsize{17}{20}\selectfont\textbf{\textcolor{white}{Ronivaldo D. Andrade}}}
+
+    \vspace{0.7em}
+    {\lexendsemibold\footnotesize\textcolor{yellow}{
+      Estagiário de Análise e Desenvolvimento de Sistemas\\
+      na Marinha do Brasil\\[.25em]
+      Diretor de Projetos da for\_code\\[.25em]
+      Matemática Aplicada — UFRJ
+    }}
+
+    \vspace{1.1em}
+    {\lexendlight\scriptsize\textcolor{white}{
+      linkedin.com/in/ronidomingues
+      \;\textcolor{lightpurple}{\textbf{·}}\;
+      github.com/ronidomingues
+    }}
+  \end{center}
+  \vfill
+
+  \note{
+    \textbf{00:01}\\[.5em]
+    Quarenta segundos. O ponto é mostrar que você usa Git e GitHub no
+    trabalho todo dia, e não só em sala.
+  }
+\end{frame}
+
+% ============================ O TRATO ==================================
+\begin{frame}{\tit{O trato de hoje}}
+  \vspace{0.5em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \rox{Você vai sair daqui sabendo}
+      \begin{itemize}
+        \item Proteger a conta e pedir os benefícios de estudante
+        \item Fazer commits, branches e merges
+        \item Resolver um conflito sem pânico
+        \item Contribuir por fork e Pull Request
+        \item Publicar um site e rodar uma automação
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \rox{O que NÃO cabe em 2 horas}
+      \begin{itemize}
+        \item Rebase e reescrita de histórico a fundo
+        \item Estratégias de branching de times grandes
+        \item Pipelines de CI/CD de produção
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{1.2em}
+  \begin{center}
+    \dest{O guia tem tudo que passar aqui, com os passos para Windows, Linux e macOS.}
+  \end{center}
+
+  \note{
+    \textbf{00:02}\\[.5em]
+    Diga que ninguém precisa anotar comandos: está tudo no guia, com os
+    exercícios e as respostas.
+  }
+\end{frame}
+
+% ============================ ROTEIRO ==================================
+\begin{frame}{\tit{Como as 2 horas vão passar}}
+  \vspace{0.3em}
+  \footnotesize
+  \begin{tabular}{@{}p{0.9cm}p{6cm}p{1.3cm}p{1.2cm}@{}}
+    \textcolor{lightpurple}{\textbf{Bloco}} & \textcolor{lightpurple}{\textbf{Assunto}} & \textcolor{lightpurple}{\textbf{Início}} & \textcolor{lightpurple}{\textbf{Tempo}} \\[.3em]
+    0 & Abertura                                     & 00:00 & 5 min  \\
+    1 & A conta: 2FA e benefícios de estudante       & 00:05 & 15 min \\
+    2 & Instalação, configuração e login             & 00:20 & 20 min \\
+    3 & Git no dia a dia: commit, branch e conflito  & 00:40 & 20 min \\
+    \textcolor{yellow}{--} & \textcolor{yellow}{Pausa}  & \textcolor{yellow}{01:00} & \textcolor{yellow}{5 min} \\
+    4 & Colaboração: fork, Pull Request e commits    & 01:05 & 20 min \\
+    5 & GitHub Pages e GitHub Actions                & 01:25 & 15 min \\
+    6 & Git LFS e assinatura de commits              & 01:40 & 15 min \\
+    7 & Encerramento                                 & 01:55 & 5 min  \\
+  \end{tabular}
+
+  \note{
+    \textbf{00:03}\\[.5em]
+    Combine a pausa em voz alta. \textbf{Controle de tempo:} se atrasar, o
+    corte sai do bloco 6 (LFS e assinatura estão completos no guia).
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{1}{A conta no GitHub}{00:05}{15 min}
+% ======================================================================
+
+\begin{frame}{\tit{Git não é GitHub}}
+  \vspace{1em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \rox{Git}\\[.4em]
+      {\lexendlight Programa de controle de versão. Roda no seu computador,
+      sem internet.}\\[.6em]
+      \cd{git commit}\\ \cd{git branch}\\ \cd{git merge}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \rox{GitHub}\\[.4em]
+      {\lexendlight Plataforma que hospeda repositórios Git e acrescenta
+      colaboração.}\\[.6em]
+      Pull Requests · Issues\\ Pages · Actions · Copilot
+    \end{column}
+  \end{columns}
+
+  \vspace{1.5em}
+  \begin{center}
+    \dest{O Git é o motor. O GitHub é a garagem com oficina.}
+  \end{center}
+
+  \note{
+    \textbf{00:05}\\[.5em]
+    A confusão entre os dois é a mais comum. Mostre que o Git funciona
+    sozinho: \cd{git init} e \cd{git commit} não precisam de internet.
+  }
+\end{frame}
+
+\begin{frame}{\tit{Proteja a conta: 2FA}}
+  \vspace{0.6em}
+  \begin{itemize}
+    \item O GitHub \dest{exige} autenticação em dois fatores de quem contribui com código
+    \item Aviso por e-mail, \rox{45 dias} para ativar, mais 7 de carência
+    \item \rox{Settings} \(\rightarrow\) \rox{Password and authentication} \(\rightarrow\) \rox{Enable 2FA}
+    \item Método principal: \dest{aplicativo autenticador} (TOTP)
+    \item Reserva: passkey ou chave de segurança
+  \end{itemize}
+
+  \vspace{1em}
+  \begin{alertblock}{Guarde os códigos de recuperação}
+    Eles são a única forma de entrar se você perder o celular.
+  \end{alertblock}
+
+  \note{
+    \textbf{00:08}\\[.5em]
+    \textbf{Faça agora:} quem já tem conta ativa o 2FA em dois minutos.
+    Quem está criando, faz depois (guia, capítulo 2).
+  }
+\end{frame}
+
+\begin{frame}{\tit{Benefícios para estudantes}}
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \rox{O que vem}
+      \begin{itemize}
+        \item \textbf{GitHub Pro} na conta pessoal
+        \item \textbf{Copilot Student}, ativado à parte
+        \item \textbf{Student Developer Pack}
+      \end{itemize}
+      \vspace{.6em}
+      \rox{GitHub Pro vs Free}
+      {\footnotesize
+      \begin{itemize}
+        \item Actions: 3.000 vs 2.000 min/mês\textsuperscript{*}
+        \item Packages: 2 GB vs 500 MB
+        \item Pages em repositório privado
+        \item Suporte por e-mail
+      \end{itemize}}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \rox{Como pedir}
+      \begin{enumerate}
+        \item[] {\small 1. Cadastre o e-mail acadêmico}
+        \item[] {\small 2. \cd{github.com/settings/}\\ \cd{education/benefits}}
+        \item[] {\small 3. \textbf{Start an application}}
+        \item[] {\small 4. Anexe o comprovante}
+        \item[] {\small 5. Aprovado? Ative o Copilot Student}
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+
+  \vspace{.5em}
+  {\scriptsize\textcolor{codecomment}{* Minutos contados só em repositórios privados. Nos públicos, o Actions é grátis.}}
+
+  \note{
+    \textbf{00:12}\\[.5em]
+    Correção comum: o Copilot \textbf{não} é o Pro, é o \emph{Copilot
+    Student}, e a ativação é um passo separado que pode levar dias. E todo
+    mundo tem o \emph{Copilot Free}, mesmo sem ser estudante.\\[.5em]
+    Dica pessoal: a foto da carteirinha com validade é a mais rápida de
+    aprovar.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{2}{Instalação, configuração e login}{00:20}{20 min}
+% ======================================================================
+
+\begin{frame}[fragile]{\tit{Instalando o Git e o GitHub CLI}}
+  \vspace{0.2em}
+  \rox{Windows} {\footnotesize (PowerShell)}
+\begin{sh}
+winget install --id Git.Git -e --source winget
+winget install --id GitHub.cli
+\end{sh}
+  \rox{Linux} {\footnotesize (Debian e Ubuntu)}
+\begin{sh}
+sudo apt install git git-lfs      # e o gh pelo repositório oficial (guia, cap. 3)
+\end{sh}
+  \rox{macOS} {\footnotesize (Homebrew)}
+\begin{sh}
+brew install git git-lfs gh
+\end{sh}
+
+  \begin{center}
+    \dest{No Windows, daqui para frente, use o Git Bash.}
+  \end{center}
+
+  \note{
+    \textbf{00:20}\\[.5em]
+    O comando do \cd{gh} no Linux é longo: mande copiar do guia, não do
+    slide. \textbf{Faça agora:} todo mundo instala. Circule pela sala.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Dizendo ao Git quem é você}}
+\begin{sh}
+git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"
+git config --global init.defaultBranch main
+git config --global pull.rebase false
+\end{sh}
+
+  \vspace{0.6em}
+  \begin{itemize}
+    \item O e-mail deve estar cadastrado na conta do GitHub
+    \item Quer privacidade? Use o e-mail \cd{noreply} do GitHub (\rox{Settings} \(\rightarrow\) \rox{Emails})
+    \item O \cd{pull.rebase false} evita o erro de \emph{divergent branches} no primeiro conflito
+  \end{itemize}
+
+  \note{
+    \textbf{00:28}\\[.5em]
+    Peça para todos conferirem com \cd{git config --global --list}.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Login: o gh resolve}}
+\begin{sh}
+gh auth login
+\end{sh}
+  \vspace{0.3em}
+  {\footnotesize
+  \begin{tabular}{@{}l l@{}}
+    Where do you use GitHub?            & \cd{GitHub.com} \\
+    Preferred protocol for Git?         & \cd{HTTPS} \\
+    Authenticate Git with your GitHub credentials? & \cd{Yes} \\
+    How would you like to authenticate? & \cd{Login with a web browser} \\
+  \end{tabular}}
+
+  \vspace{0.8em}
+  \begin{alertblock}{Por que isso importa}
+    Desde 2021 o GitHub não aceita a senha no terminal. O \textbf{Yes}
+    empresta o login do gh ao Git: é isso que faz o \texttt{git push}
+    funcionar.
+  \end{alertblock}
+
+  \note{
+    \textbf{00:32}\\[.5em]
+    Confira com \cd{gh auth status}. Quem preferir SSH tem o passo a passo no
+    guia (capítulo 4), junto com os tokens fine-grained.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{3}{Git no dia a dia}{00:40}{20 min}
+% ======================================================================
+
+\begin{frame}{\tit{As três áreas do Git}}
+  \vspace{1.2em}
+  \begin{center}
+    \begin{tikzpicture}[caixa/.style={draw=lightpurple, line width=1.2pt, rounded corners=3pt,
+        minimum width=3.1cm, minimum height=1.3cm, align=center, text=white}]
+      \node[caixa] (w) at (0,0) {\textbf{Trabalho}\\[-2pt]{\scriptsize os arquivos}};
+      \node[caixa] (s) at (4,0) {\textbf{Preparação}\\[-2pt]{\scriptsize o próximo commit}};
+      \node[caixa] (r) at (8,0) {\textbf{Repositório}\\[-2pt]{\scriptsize o histórico}};
+      \draw[->, yellow, line width=1.5pt] (w) -- node[above]{\cd{add}} (s);
+      \draw[->, yellow, line width=1.5pt] (s) -- node[above]{\cd{commit}} (r);
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{1.2em}
+  \begin{center}
+    \dest{Commit é uma fotografia do projeto, com autor, data e o porquê.}
+  \end{center}
+
+  \note{
+    \textbf{00:40}\\[.5em]
+    Analogia: você separa numa caixa o que vai enviar (\cd{add}) e lacra e
+    registra no protocolo (\cd{commit}).
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{O primeiro repositório}}
+\begin{sh}
+gh repo create meu-primeiro-repo --public --clone
+cd meu-primeiro-repo
+echo "# Meu Primeiro Projeto" > README.md
+git status
+git add README.md
+git commit -m "docs: cria o README"
+git push -u origin main
+\end{sh}
+
+  \vspace{0.3em}
+  \begin{center}
+    \rox{O \cd{-u} liga a sua main à do GitHub: depois, basta \cd{git push}.}
+  \end{center}
+
+  \note{
+    \textbf{00:44}\\[.5em]
+    \textbf{Faça agora:} Exercício 2 do guia. Quem terminar, abre a página do
+    repositório e vê o README formatado.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Branches}}
+\begin{sh}
+git switch -c feature/login      # cria a branch e entra nela
+# ... edita, add, commit ...
+git switch main                  # volta para a main
+git merge feature/login          # traz o trabalho
+\end{sh}
+
+  \vspace{0.5em}
+  \begin{itemize}
+    \item Branch é uma \dest{linha de trabalho}, não uma cópia do projeto
+    \item Criar uma branch é instantâneo, mesmo num projeto enorme
+    \item \cd{git switch} é o comando moderno; o \cd{checkout} antigo ainda funciona
+  \end{itemize}
+
+  \note{
+    \textbf{00:50}\\[.5em]
+    Desenhe no quadro: a main como uma linha, a branch saindo dela e voltando
+    no merge.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Conflito não é erro}}
+  \vspace{0.2em}
+  {\small Duas pessoas mudaram a \textbf{mesma linha}. O Git pede uma decisão:}
+\begin{sh}
+<<<<<<< HEAD
+# Meu Primeiro Projeto (editado no computador)
+=======
+# Meu Primeiro Projeto (editado no site)
+>>>>>>> 15261e4
+\end{sh}
+  \begin{enumerate}
+    \item Deixe só o que deve ficar e apague os marcadores
+    \item \cd{git add README.md}
+    \item \cd{git commit} e \cd{git push}
+  \end{enumerate}
+  \begin{center}
+    \rox{Perdeu-se? \cd{git merge --abort} volta ao estado de antes.}
+  \end{center}
+
+  \note{
+    \textbf{00:54}\\[.5em]
+    \textbf{Faça agora:} Exercício 4 do guia. Ele cria o conflito de propósito:
+    edita a mesma linha no site e no computador.
+  }
+\end{frame}
+
+% ============================ PAUSA ====================================
+\begin{frame}[plain]
+  \vfill
+  \begin{center}
+    {\fontsize{30}{36}\selectfont\textbf{\textcolor{white}{Pausa}}}
+
+    \vspace{1em}
+    {\lexendsemibold\textcolor{yellow}{\large 01:00 \quad · \quad 5 min}}
+  \end{center}
+  \vfill
+
+  \note{
+    \textbf{01:00}\\[.5em]
+    Use a pausa para ajudar quem ficou para trás na instalação ou no login.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{4}{Colaboração}{01:05}{20 min}
+% ======================================================================
+
+\begin{frame}{\tit{Fork e Pull Request}}
+  \vspace{0.8em}
+  \begin{enumerate}
+    \item \rox{Fork}: sua cópia do projeto de outra pessoa
+    \item \rox{Clone} do seu fork
+    \item \rox{Branch} para a sua mudança
+    \item \rox{Commit} e \rox{push} para o seu fork
+    \item \rox{Pull Request}: o pedido para integrar no projeto original
+    \item \rox{Revisão}: comentários, ajustes, aprovação e merge
+  \end{enumerate}
+
+  \vspace{1em}
+  \begin{center}
+    \dest{O Pull Request é uma conversa antes de integrar.}
+  \end{center}
+
+  \note{
+    \textbf{01:05}\\[.5em]
+    Mostre um PR real, com comentários de revisão, no navegador.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Mão na massa: a lista de presença}}
+\begin{sh}
+gh repo fork ronidomingues/github-training --clone
+cd github-training
+git switch -c presenca/seu-nome
+echo "Minha avaliação" > "presences/Seu Nome.txt"
+git add presences
+git commit -m "chore(presences): registra a presença de Seu Nome"
+git push -u origin presenca/seu-nome
+gh pr create --repo ronidomingues/github-training --fill
+\end{sh}
+
+  \begin{center}
+    \rox{Aceito o PR, o seu nome entra no anexo do guia.}
+  \end{center}
+
+  \note{
+    \textbf{01:10}\\[.5em]
+    Exercício 7 do guia. Aceite alguns PRs ao vivo, para mostrarem o merge
+    acontecendo.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{Mensagens que se explicam}}
+  \vspace{0.2em}
+  \rox{Conventional Commits}: \cd{<tipo>(escopo): descrição}
+\begin{sh}
+feat(relatorio): exporta em PDF
+fix(login): aceita senha vazia sem erro
+docs(readme): explica a instalação
+ci: roda os testes a cada push
+\end{sh}
+  {\footnotesize
+  \begin{tabular}{@{}l l l l@{}}
+    \cd{feat} novo recurso & \cd{fix} correção & \cd{docs} documentação & \cd{test} testes \\
+    \cd{refactor} reorganização & \cd{style} formatação & \cd{ci} automação & \cd{chore} manutenção \\
+  \end{tabular}}
+
+  \vspace{0.6em}
+  \begin{center}
+    \dest{O melhor padrão é o que a equipe combinou e segue.}
+  \end{center}
+
+  \note{
+    \textbf{01:18}\\[.5em]
+    Emojis (gitmoji) são opcionais. O guia, capítulo 7, mostra os cuidados:
+    o emoji antes do tipo quebra o padrão para as ferramentas.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{5}{GitHub Pages e GitHub Actions}{01:25}{15 min}
+% ======================================================================
+
+\begin{frame}{\tit{Um site a partir do repositório}}
+  \vspace{0.6em}
+  \begin{itemize}
+    \item Sites estáticos: HTML, CSS e JavaScript
+    \item Endereço: \cd{<usuario>.github.io/<repositorio>/}
+    \item \rox{Settings} \(\rightarrow\) \rox{Pages} \(\rightarrow\) \rox{Source}:
+    \begin{itemize}
+      \item \textbf{Deploy from a branch}: branch \cd{main}, pasta \cd{/(root)}
+      \item \textbf{GitHub Actions}: quando o site é gerado antes de publicar
+    \end{itemize}
+  \end{itemize}
+
+  \vspace{0.8em}
+  \begin{alertblock}{O erro 404 mais comum}
+    O \texttt{index.html} precisa estar na raiz da pasta publicada, e não
+    dentro de uma subpasta.
+  \end{alertblock}
+
+  \note{
+    \textbf{01:25}\\[.5em]
+    Exercício 5: o jogo da memória. Mostre o site publicado de um aluno.
+  }
+\end{frame}
+
+\begin{frame}[fragile]{\tit{GitHub Actions em um arquivo}}
+\begin{yml}
+on:
+  push:
+    branches: [ main ]
+permissions:
+  contents: write            # sem isto, o git push dá 403
+jobs:
+  executar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+      - run: python main.py
+\end{yml}
+  {\footnotesize \textcolor{codecomment}{\texttt{.github/workflows/python.yml} — exemplo completo no guia, capítulo 8}}
+
+  \note{
+    \textbf{01:32}\\[.5em]
+    Vocabulário: evento, job, step, runner. E o mito do \cd{[skip ci]}: o
+    push feito pelo próprio workflow com o GITHUB\_TOKEN \textbf{não} dispara
+    o workflow de novo.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{6}{Arquivos grandes e assinatura}{01:40}{15 min}
+% ======================================================================
+
+\begin{frame}[fragile]{\tit{Git LFS: arquivos grandes}}
+\begin{sh}
+git lfs install                  # uma vez por usuário
+git lfs track "*.psd"            # grava a regra no .gitattributes
+git add .gitattributes arte.psd
+git commit -m "chore: versiona a arte com Git LFS"
+\end{sh}
+  \begin{itemize}
+    \item O GitHub \dest{recusa arquivos acima de 100 MiB} num push comum
+    \item No repositório fica só um ponteiro; o arquivo vai para o LFS
+    \item 10 GiB de armazenamento e 10 GiB de banda por mês
+  \end{itemize}
+
+  \note{
+    \textbf{01:40}\\[.5em]
+    O limite de 100 MiB é do GitHub, não do Git. Configure o LFS antes de
+    adicionar o arquivo grande.
+  }
+\end{frame}
+
+\begin{frame}{\tit{Quem fez este commit?}}
+  \vspace{0.4em}
+  {\small O autor de um commit é só um texto. Qualquer um pode escrever qualquer nome.}
+
+  \vspace{0.8em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \rox{Assinatura com GPG}
+      \begin{itemize}
+        \item \cd{gpg --full-generate-key}
+        \item Chave em \rox{New GPG key}
+        \item \cd{commit.gpgsign true}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \rox{Assinatura com SSH}
+      \begin{itemize}
+        \item \cd{gpg.format ssh}
+        \item Chave como \rox{Signing Key}
+        \item Git 2.34 ou mais novo
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{1em}
+  \begin{center}
+    \dest{Resultado: o selo Verified ao lado do commit.}
+  \end{center}
+
+  \note{
+    \textbf{01:47}\\[.5em]
+    Demonstre com \cd{git -c user.name="Linus Torvalds" commit} como é fácil
+    se passar por outra pessoa. O passo a passo completo está no guia,
+    capítulo 9.
+  }
+\end{frame}
+
+% ======================================================================
+\bloco{7}{Encerramento}{01:55}{5 min}
+% ======================================================================
+
+\begin{frame}{\tit{Os erros que você ainda vai ver}}
+  \vspace{0.6em}
+  \footnotesize
+  \begin{tabular}{@{}p{5.2cm}p{5.5cm}@{}}
+    \textcolor{lightpurple}{\textbf{Mensagem}} & \textcolor{lightpurple}{\textbf{O que fazer}} \\[.4em]
+    \cd{! [rejected] (fetch first)}     & \cd{git pull}, resolva e \cd{git push} \\[.45em]
+    \cd{divergent branches}             & \cd{git config --global pull.rebase false} \\[.45em]
+    \cd{CONFLICT (content)}             & edite, \cd{git add}, \cd{git commit} \\[.45em]
+    \cd{Authentication failed}          & \cd{gh auth login} ou \cd{gh auth setup-git} \\[.45em]
+    Push de workflow com erro 403       & \cd{permissions: contents: write} \\[.45em]
+    Site do Pages com 404               & \texttt{index.html} fora da raiz \\
+  \end{tabular}
+
+  \note{
+    \textbf{01:55}\\[.5em]
+    Não leia a tabela. Diga que todos estão no guia, com causa e correção.
+  }
+\end{frame}
+
+\begin{frame}{\tit{Para onde ir depois}}
+  \vspace{0.3em}
+  \begin{columns}[c]
+    \begin{column}{0.55\textwidth}
+      \rox{Estudar}
+      \begin{itemize}
+        \item[] {\small Pro Git (gratuito, em português)}
+        \item[] {\small GitHub Skills}
+        \item[] {\small Learn Git Branching}
+      \end{itemize}
+      \vspace{.6em}
+      \rox{Praticar}
+      \begin{itemize}
+        \item[] {\small Um projeto seu com README, licença e workflow}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.4\textwidth}
+      \begin{center}
+        \begin{tikzpicture}
+          \node[fill=white, inner sep=5pt, rounded corners=2pt]
+            {\color{darkpurple}\qrcode[height=2.6cm, level=M]{https://andradasdev.github.io/github/}};
+        \end{tikzpicture}
+
+        \vspace{0.5em}
+        {\lexendsemibold\footnotesize\textcolor{white}{Guia e materiais}}\\[.15em]
+        {\lexendlight\scriptsize\textcolor{lightpurple}{andradasdev.github.io/github}}
+      \end{center}
+    \end{column}
+  \end{columns}
+
+  \note{
+    \textbf{01:57}\\[.5em]
+    Passe o link. O guia tem os exercícios com respostas: ninguém precisava
+    ter anotado nada.
+  }
+\end{frame}
+
+% ============================ FINAL ====================================
+\begin{frame}[plain]
+  \vspace{2em}
+  \includegraphics[width=0.18\linewidth]{./assets/logos/for_code_para_fundo_escuro.png}
+
+  \vfill
+  \begin{columns}[c]
+    \begin{column}{0.62\textwidth}
+      \textbf{{\fontsize{40}{48}\selectfont Obrigado!}} \\
+      \vspace{1.5em}
+      \textbf{\textcolor{lightpurple}{{\large
+      Capacitação de Git e GitHub \\
+      \vspace{0.8em}
+      Ronivaldo D. Andrade \\
+      \vspace{0.8em}
+      Edição 2025 · Revisão 2026
+      }}}
+    \end{column}
+    \begin{column}{0.34\textwidth}
+      \includegraphics[width=\linewidth]{./assets/images/gato.png}
+    \end{column}
+  \end{columns}
+
+  \note{
+    \textbf{02:00}\\[.5em]
+    Abra para perguntas. Lembre de aceitar os PRs de presença que ficaram
+    abertos.
+  }
+\end{frame}
