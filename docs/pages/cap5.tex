@@ -1,92 +1,105 @@
-\chapter{Git LFS}
-\section{O que é?}
+% ======================================================================
+\chapter{Git LFS: arquivos grandes}
+\label{cap:lfs}
+% ======================================================================
 
-O \textbf{Git LFS (Large File Storage)} é uma extensão oficial do Git projetada para o gerenciamento de \textbf{arquivos grandes ou binários} que não são tratados de forma eficiente pelo Git tradicional.  
-Em vez de armazenar o conteúdo completo desses arquivos no histórico do repositório, o Git LFS substitui o arquivo original por um \textbf{ponteiro leve} — um pequeno arquivo de texto contendo informações sobre o objeto real, como seu identificador (\textit{hash}) e tamanho.  
-O conteúdo real é armazenado separadamente, em um \textbf{servidor LFS}, podendo estar hospedado no próprio provedor Git (como o GitHub, GitLab ou Bitbucket) ou em um servidor dedicado.
+\section{O problema}
 
-Essa estratégia mantém o repositório \textbf{mais leve e ágil}, reduzindo o tempo de \textit{clone}, \textit{checkout} e \textit{fetch}, além de facilitar o versionamento de arquivos que mudam com frequência, como imagens, vídeos, áudios, modelos de aprendizado de máquina, arquivos de design (\texttt{.psd}), pacotes compactados (\texttt{.zip}), entre outros.
-
-\subsection{Motivos e Problemas que Resolve}
-
-Por padrão, o Git não é otimizado para lidar com arquivos grandes ou binários, pois ele foi projetado para versionar \textbf{texto}, como código-fonte.  
-Existem várias limitações e problemas ao tentar versionar arquivos grandes diretamente:
+O Git foi feito para texto, como código-fonte. Com arquivos grandes e binários
+(vídeos, imagens pesadas, modelos de aprendizado de máquina, arquivos
+\texttt{.psd} ou \texttt{.zip}), aparecem três problemas:
 
 \begin{itemize}
-  \item \textbf{Limite de tamanho:} serviços como o GitHub impõem limites de \textbf{100 MB por arquivo}, impedindo o envio de arquivos muito grandes via Git comum.
-  \item \textbf{Histórico inflado:} cada nova versão de um arquivo binário é armazenada integralmente, sem compressão eficiente, o que faz o repositório crescer rapidamente.
-  \item \textbf{Operações lentas:} com muitos arquivos grandes no histórico, operações como \texttt{git clone}, \texttt{git fetch} e \texttt{git checkout} tornam-se mais lentas.
-  \item \textbf{Dificuldade de merge:} arquivos binários não podem ser mesclados (\textit{merge}) facilmente, aumentando o risco de conflitos.
+  \item \textbf{Limite do GitHub:} o GitHub avisa a partir de 50 MiB e
+        \textbf{recusa arquivos acima de 100 MiB} num push comum
+        \cite{github_lfs}. Esse limite é do GitHub, não do Git.
+  \item \textbf{Histórico que só cresce:} binários quase não se beneficiam da
+        forma como o Git guarda diferenças entre versões. Cada versão nova de
+        um arquivo grande ocupa quase o tamanho inteiro de novo, e todo
+        \comando{git clone} baixa todas elas.
+  \item \textbf{Operações lentas:} com muitos binários no histórico,
+        \comando{clone}, \comando{fetch} e \comando{checkout} ficam lentos.
 \end{itemize}
 
-O \textbf{Git LFS} resolve esses problemas ao:
-\begin{itemize}
-  \item Armazenar apenas \textbf{ponteiros leves} no repositório Git;
-  \item Manter o conteúdo real em um \textbf{armazenamento separado}, acessível sob demanda;
-  \item Permitir a \textbf{revogação ou substituição} de arquivos sem reescrever o histórico;
-  \item Proporcionar uma experiência de versionamento \textbf{transparente}, pois os comandos Git (\texttt{add}, \texttt{commit}, \texttt{push}) continuam funcionando normalmente.
-\end{itemize}
+\section{A solução}
 
-\subsection{Como Funciona}
+\begin{conceito}[Git LFS]
+O \textbf{Git LFS} (\emph{Large File Storage}) é uma extensão do Git. No
+repositório fica só um \textbf{ponteiro} pequeno, de texto. O conteúdo real vai
+para um armazenamento separado, no próprio GitHub, e é baixado só quando
+necessário. Os comandos do dia a dia (\comando{add}, \comando{commit},
+\comando{push}) continuam os mesmos.
+\end{conceito}
 
-O Git LFS utiliza um sistema de filtros configurados no Git:
-\begin{itemize}
-  \item O filtro \textbf{clean} atua ao adicionar um arquivo rastreado pelo LFS, substituindo seu conteúdo real por um ponteiro antes de armazená-lo no repositório.
-  \item O filtro \textbf{smudge} atua durante o \texttt{checkout} ou \texttt{clone}, baixando automaticamente o arquivo real do servidor LFS e substituindo o ponteiro pelo conteúdo original no diretório de trabalho.
-\end{itemize}
+O ponteiro gravado no Git tem esta cara:
 
-O arquivo versionado no Git contém apenas algo como:
-
-\begin{verbatim}
+\begin{saida}
 version https://git-lfs.github.com/spec/v1
-oid sha256:3b6f1a8a...
-size 1258291
-\end{verbatim}
+oid sha256:e1ea497dccb8bd9d842c37f70699210c4db6d6981d7c41fecd1d028d16fade26
+size 200000
+\end{saida}
 
-Essas informações são suficientes para que o Git LFS localize e baixe o conteúdo correto quando necessário.
-
-\subsection{Vantagens}
+\section{Instalação}
 
 \begin{itemize}
-  \item Mantém o repositório leve e rápido;
-  \item Suporta arquivos grandes (acima de 100 MB);
-  \item Permite versionamento de arquivos binários;
-  \item Integra-se com GitHub, GitLab e Bitbucket;
-  \item Possibilita bloqueio de arquivos (\textit{lock}) para evitar conflitos.
+  \item \textbf{Windows:} já vem com o Git para Windows.
+  \item \textbf{Linux (Debian e Ubuntu):} \comando{sudo apt install git-lfs}.
+  \item \textbf{macOS:} \comando{brew install git-lfs}.
 \end{itemize}
 
-\subsection{Limitações}
+Depois, rode \textbf{uma vez por usuário}:
 
-\begin{itemize}
-  \item O armazenamento LFS pode ter \textbf{cotas e custos adicionais} em serviços remotos;
-  \item Necessita de \textbf{instalação e configuração} local (\texttt{git lfs install});
-  \item Requer que o \textbf{servidor remoto suporte LFS};
-  \item Para repositórios antigos, pode ser necessário \textbf{migrar o histórico}.
-\end{itemize}
-
-\subsection{Exemplo de Uso}
-
-\begin{verbatim}
-# Instala o Git LFS no sistema
+\begin{bashcode}
 git lfs install
+\end{bashcode}
 
-# Define tipos de arquivo que serão rastreados pelo LFS
+\begin{saida}
+Updated git hooks.
+Git LFS initialized.
+\end{saida}
+
+Esse comando não instala o programa: ele liga o LFS na configuração do seu
+Git.
+
+\section{Usando}
+
+\begin{bashcode}
+# diz ao LFS quais arquivos ele deve cuidar
 git lfs track "*.zip"
 git lfs track "*.psd"
 
-# Adiciona e versiona normalmente
+# a regra fica gravada no .gitattributes, que também vai para o repositório
 git add .gitattributes
-git add arquivo.zip
-git commit -m "Adiciona arquivo grande com Git LFS"
-git push origin main
-\end{verbatim}
+git add materiais.zip
+git commit -m "chore: versiona os materiais com Git LFS"
+git push
 
-\subsection{Boas Práticas}
+# confere o que está no LFS
+git lfs ls-files
+\end{bashcode}
+
+\begin{aviso}[Configure antes de adicionar]
+O \comando{git lfs track} só vale para o que for adicionado \emph{depois}. Um
+arquivo grande que já entrou no histórico como arquivo comum continua lá.
+Mover arquivos antigos para o LFS exige \comando{git lfs migrate}, que
+\textbf{reescreve o histórico} e precisa ser combinado com a equipe.
+\end{aviso}
+
+\section{Limites e custos no GitHub}
 
 \begin{itemize}
-  \item Configure o Git LFS \textbf{antes de adicionar arquivos grandes};
-  \item Use o comando \texttt{git lfs track} para definir padrões de arquivos;
-  \item Verifique o status com \texttt{git lfs status};
-  \item Evite rastrear arquivos pequenos em grande quantidade;
-  \item Monitore o uso de armazenamento e transferências.
+  \item Cada conta tem \textbf{10 GiB de armazenamento} e \textbf{10 GiB de
+        banda} de LFS por mês, tanto no plano Free quanto no Pro
+        \cite{github_lfs_uso}. Acima disso, o uso é cobrado.
+  \item O tamanho máximo de um arquivo no LFS é de 2 GB nos planos Free e
+        Pro.
+  \item \textbf{Apagar um arquivo do LFS não libera espaço} sozinho. Para
+        remover de verdade, é preciso reescrever o histórico ou apagar o
+        repositório.
 \end{itemize}
+
+\begin{dica}[Quando não usar]
+Não use o LFS para arquivos pequenos em grande quantidade nem para o que pode
+ser gerado de novo (arquivos compilados, dependências): esses devem ir para o
+\arq{.gitignore}.
+\end{dica}

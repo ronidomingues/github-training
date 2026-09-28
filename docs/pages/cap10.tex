@@ -1,0 +1,334 @@
+% ======================================================================
+\chapter{Exercícios práticos}
+\label{cap:exercicios}
+% ======================================================================
+
+Faça os exercícios na ordem. Todos os comandos são digitados no \textbf{Git
+Bash} (Windows) ou no \textbf{Terminal} (Linux e macOS).
+
+Os materiais dos exercícios (\arq{jogo-da-memoria.zip}, \arq{main.py} e
+\arq{modelo-actions.zip}) podem ser baixados pelos botões do topo da página
+\url{https://andradasdev.github.io/github/} ou na pasta \arq{materials/} do
+repositório \texttt{ronidomingues/github-training}. Os comandos abaixo supõem que eles foram
+salvos na pasta \arq{Downloads}.
+
+\begin{dica}[Pasta de treino]
+Crie uma pasta só para os exercícios, por exemplo \arq{\textasciitilde/treino},
+e entre nela com \comando{cd \textasciitilde/treino} antes de começar.
+\end{dica}
+
+% ----------------------------------------------------------------------
+\section{Exercício 1 — Conferir as ferramentas}
+
+\begin{bashcode}
+git --version
+gh --version
+gh auth status
+\end{bashcode}
+
+\textbf{Como saber se deu certo:} as duas primeiras linhas mostram números de
+versão, e a terceira diz \texttt{Logged in to github.com account
+<seu-usuario>}. Se não estiver logado, volte ao capítulo~\ref{cap:git}.
+
+% ----------------------------------------------------------------------
+\section{Exercício 2 — O primeiro repositório}
+
+\begin{enumerate}
+  \item Crie o repositório no GitHub e já traga a cópia para o computador:
+\begin{bashcode}
+gh repo create meu-primeiro-repo --public --description "Meu primeiro repositório" --clone
+cd meu-primeiro-repo
+\end{bashcode}
+  O Git avisa \texttt{You appear to have cloned an empty repository}. É
+  normal: o repositório ainda não tem nenhum arquivo.
+
+  \item Crie o \arq{README.md}, a \enquote{capa} do projeto no GitHub, escrita
+        em Markdown:
+\begin{bashcode}
+cat > README.md << 'EOF'
+# Meu Primeiro Projeto
+
+Este é meu primeiro repositório no GitHub!
+
+## O que este projeto faz?
+
+- Aprender Git e GitHub
+- Praticar comandos
+EOF
+\end{bashcode}
+
+  \item Registre e envie:
+\begin{bashcode}
+git add README.md
+git commit -m "docs: cria o README"
+git push -u origin main
+\end{bashcode}
+\end{enumerate}
+
+\begin{conceito}[O que o -u faz]
+O \texttt{-u} liga a sua branch \texttt{main} à branch \texttt{main} do
+GitHub (\texttt{origin}). Isso só precisa ser feito no primeiro push: depois,
+basta \comando{git push} e \comando{git pull}.
+\end{conceito}
+
+\textbf{Como saber se deu certo:} a página
+\texttt{github.com/<seu-usuario>/meu-primeiro-repo} mostra o README
+formatado.
+
+% ----------------------------------------------------------------------
+\section{Exercício 3 — Uma licença criada pelo site}
+
+Este exercício mostra o caminho inverso: uma mudança feita no GitHub que
+precisa chegar ao seu computador.
+
+\begin{enumerate}
+  \item Na página do repositório, clique em \menu{Add file} \(\rightarrow\)
+        \menu{Create new file}.
+  \item Digite \texttt{LICENSE} como nome. Aparece o botão
+        \menu{Choose a license template}: escolha \menu{MIT License},
+        confira seu nome e clique em \menu{Review and submit}.
+  \item Clique em \menu{Commit changes}.
+  \item No terminal, traga a novidade:
+\begin{bashcode}
+git pull
+ls
+\end{bashcode}
+\end{enumerate}
+
+\textbf{Como saber se deu certo:} o \comando{ls} mostra o arquivo
+\arq{LICENSE}, e o \comando{git log --oneline} tem dois commits.
+
+% ----------------------------------------------------------------------
+\section{Exercício 4 — Resolver um conflito}
+
+\begin{enumerate}
+  \item \textbf{No site:} abra o \arq{README.md} do
+        \texttt{meu-primeiro-repo}, clique no lápis (\menu{Edit}), troque a
+        primeira linha por \texttt{\# Meu Primeiro Projeto (editado no site)}
+        e clique em \menu{Commit changes}.
+  \item \textbf{No computador, sem dar pull:} abra o \arq{README.md} num
+        editor, troque a \emph{mesma} primeira linha por
+        \texttt{\# Meu Primeiro Projeto (editado no computador)}, salve e
+        registre:
+\begin{bashcode}
+git commit -am "docs: edita o título no computador"
+git push
+\end{bashcode}
+  O push é recusado, porque o GitHub tem um commit que você não tem:
+\begin{saida}
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/...'
+\end{saida}
+
+  \item Traga a alteração do site:
+\begin{bashcode}
+git pull
+\end{bashcode}
+\begin{saida}
+CONFLICT (content): Merge conflict in README.md
+Automatic merge failed; fix conflicts and then commit the result.
+\end{saida}
+
+  \item Abra o \arq{README.md}. O Git colocou as duas versões dentro dele:
+\begin{saida}
+<<<<<<< HEAD
+# Meu Primeiro Projeto (editado no computador)
+=======
+# Meu Primeiro Projeto (editado no site)
+>>>>>>> 15261e4...
+\end{saida}
+  Entre \texttt{<<<<<<<} e \texttt{=======} está a sua versão; entre
+  \texttt{=======} e \texttt{>>>>>>>}, a que veio do GitHub. Deixe só a
+  linha que deve ficar (ou escreva uma terceira), apague os três marcadores e
+  salve.
+
+  \item Registre a resolução e envie:
+\begin{bashcode}
+git add README.md
+git commit -m "docs: resolve o conflito do título"
+git push
+\end{bashcode}
+\end{enumerate}
+
+\textbf{Como saber se deu certo:} \comando{git log --oneline --graph} mostra
+as duas linhas de trabalho se juntando no commit de resolução.
+
+\begin{aviso}
+Se o \comando{git pull} terminar em \texttt{Need to specify how to reconcile
+divergent branches}, rode \comando{git config --global pull.rebase false} e
+repita o pull.
+\end{aviso}
+
+% ----------------------------------------------------------------------
+\section{Exercício 5 — Um site no GitHub Pages}
+
+\begin{enumerate}
+  \item Crie o repositório do site:
+\begin{bashcode}
+cd ~/treino
+gh repo create meu-site --public --description "Meu primeiro site" --clone
+cd meu-site
+\end{bashcode}
+
+  \item Descompacte o \arq{jogo-da-memoria.zip} dentro de \arq{Downloads}
+        (no Windows: botão direito \(\rightarrow\) \menu{Extrair tudo}). Ele
+        cria a pasta \arq{jogo-da-memoria/}. Copie o \textbf{conteúdo} dela,
+        e não a pasta, para dentro do \arq{meu-site}:
+\begin{bashcode}
+cp -r ~/Downloads/jogo-da-memoria/. .
+ls
+\end{bashcode}
+  O \comando{ls} precisa mostrar o \arq{index.html} aqui, na raiz.
+
+  \item Registre e envie:
+\begin{bashcode}
+git add .
+git commit -m "feat: adiciona o jogo da memória"
+git push -u origin main
+\end{bashcode}
+
+  \item No GitHub: \menu{Settings} \(\rightarrow\) \menu{Pages}. Em
+        \menu{Source}, escolha \menu{Deploy from a branch}; em
+        \menu{Branch}, \texttt{main} e \texttt{/(root)}; clique em
+        \menu{Save}.
+\end{enumerate}
+
+\textbf{Como saber se deu certo:} depois de um ou dois minutos, o jogo abre
+em \texttt{https://<seu-usuario>.github.io/meu-site/}.
+
+% ----------------------------------------------------------------------
+\section{Exercício 6 — Automação com GitHub Actions}
+
+\begin{enumerate}
+  \item Crie o repositório e copie o \arq{main.py} para dentro dele:
+\begin{bashcode}
+cd ~/treino
+gh repo create meu-script-python --public --description "Script Python com GitHub Actions" --clone
+cd meu-script-python
+cp ~/Downloads/main.py .
+\end{bashcode}
+
+  \item Crie a pasta dos workflows e o arquivo:
+\begin{bashcode}
+mkdir -p .github/workflows
+\end{bashcode}
+  Abra um arquivo novo \arq{.github/workflows/python.yml} no editor e cole o
+  Exemplo 2 do capítulo~\ref{cap:pages}.
+
+  \item Envie:
+\begin{bashcode}
+git add .
+git commit -m "ci: roda o script Python a cada push"
+git push -u origin main
+\end{bashcode}
+
+  \item Acompanhe na aba \menu{Actions} do repositório, ou com
+        \comando{gh run watch}. Quando terminar, traga o arquivo gerado:
+\begin{bashcode}
+git pull
+cat resultado.txt
+\end{bashcode}
+\end{enumerate}
+
+\textbf{Como saber se deu certo:} o \arq{resultado.txt} mostra o horário da
+execução, e o último commit do repositório é do \texttt{github-actions[bot]}.
+
+\begin{dica}[Outro modelo]
+O \arq{modelo-actions.zip}, em \arq{materials/}, traz o mesmo fluxo para um
+programa em Fortran: compila, executa e grava o resultado.
+\end{dica}
+
+% ----------------------------------------------------------------------
+\section{Exercício 7 — Fork, Pull Request e lista de presença}
+\label{sec:ex_presenca}
+
+A lista de presença deste guia (Anexo~\ref{an:presenca}) é feita por Pull
+Request. É o fluxo real de contribuir com o projeto de outra pessoa.
+
+\begin{enumerate}
+  \item Crie o seu fork e clone:
+\begin{bashcode}
+cd ~/treino
+gh repo fork ronidomingues/github-training --clone
+cd github-training
+\end{bashcode}
+
+  \item Crie uma branch para a sua contribuição:
+\begin{bashcode}
+git switch -c presenca/seu-nome
+\end{bashcode}
+
+  \item Crie um arquivo com o seu nome na pasta \arq{presences/}. Use só
+        letras, números, espaços, pontos e hífens no nome. Se quiser, escreva
+        uma avaliação da capacitação dentro dele.
+\begin{bashcode}
+echo "Gostei muito da parte de conflitos!" > "presences/Seu Nome.txt"
+\end{bashcode}
+
+  \item Registre e envie para o \emph{seu} fork:
+\begin{bashcode}
+git add presences
+git commit -m "chore(presences): registra a presença de Seu Nome"
+git push -u origin presenca/seu-nome
+\end{bashcode}
+
+  \item Abra o Pull Request. No GitHub, na página do seu fork, clique em
+        \menu{Compare \& pull request}, confira que a base é
+        \texttt{ronidomingues/github-training} e clique em
+        \menu{Create pull request}. Pelo terminal:
+\begin{bashcode}
+gh pr create --repo ronidomingues/github-training --fill
+\end{bashcode}
+\end{enumerate}
+
+\textbf{Como saber se deu certo:} o PR aparece na aba \menu{Pull requests} do
+repositório original. Depois que ele for aceito, o seu nome entra na lista
+de presença da próxima versão do guia.
+
+% ----------------------------------------------------------------------
+\section{Exercício 8 — Mensagens de commit}
+
+Reescreva cada mensagem no formato Conventional Commits
+(capítulo~\ref{cap:padroes}):
+
+\begin{enumerate}
+  \item \enquote{arrumei o erro que dava quando a senha tava vazia}
+  \item \enquote{coloquei explicação de como instalar no readme}
+  \item \enquote{agora o relatório sai em pdf também}
+  \item \enquote{atualizei o workflow pra rodar os testes}
+\end{enumerate}
+
+\begin{dica}[Respostas possíveis]
+\texttt{fix(login): aceita senha vazia sem erro} ·
+\texttt{docs(readme): explica a instalação} ·
+\texttt{feat(relatorio): exporta em PDF} ·
+\texttt{ci: roda os testes no workflow}
+\end{dica}
+
+% ----------------------------------------------------------------------
+\section{Exercício 9 — Um commit assinado}
+
+Siga o capítulo~\ref{cap:assinatura} com GPG ou SSH e faça um commit no
+\texttt{meu-primeiro-repo}:
+
+\begin{bashcode}
+git commit --allow-empty -m "chore: testa a assinatura"
+git push
+git log --format='%h %G? %s' -1
+\end{bashcode}
+
+\textbf{Como saber se deu certo:} o terminal mostra a letra \texttt{G}, e a
+aba \menu{Commits} do GitHub mostra o selo \textbf{Verified}.
+
+% ----------------------------------------------------------------------
+\section{Checklist}
+
+\begin{itemize}
+  \item[$\square$] Git e GitHub CLI instalados e logados
+  \item[$\square$] Repositório criado, com README e LICENSE
+  \item[$\square$] Um conflito resolvido
+  \item[$\square$] Site publicado no GitHub Pages
+  \item[$\square$] Workflow rodando no GitHub Actions
+  \item[$\square$] Pull Request de presença aberto
+  \item[$\square$] Commit assinado com selo \textbf{Verified}
+\end{itemize}

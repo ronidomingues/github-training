@@ -1,460 +1,329 @@
-\chapter{Exercícios Práticos}
+% ======================================================================
+\chapter{Assinatura de commits com GPG e SSH}
+\label{cap:assinatura}
 
-\textbf{Observação:} Todas as atividades devem seguir as boas práticas de commits, merges e pull requests.
+\section{O problema: o autor de um commit é só um texto}
 
-\section{Git e GitHub-CLI}
+No capítulo~\ref{cap:git} configuramos o nome e o e-mail com \comando{git config}. O Git aceita \textbf{qualquer} valor ali, sem conferir nada. Veja:
 
-\subsection{Objetivo}
-Verificar se as ferramentas estão instaladas corretamente.
+\begin{bashcode}
+git -c user.name="Linus Torvalds" -c user.email="torvalds@linux-foundation.org" \
+    commit --allow-empty -m "Commit que parece do Linus"
+git log --format='%an <%ae>' -1
+\end{bashcode}
+\begin{saida}
+Linus Torvalds <torvalds@linux-foundation.org>
+\end{saida}
 
-\subsection{Passo a Passo Detalhado}
+O commit foi feito por nós, mas o histórico diz que foi o criador do Git. Se esse commit for enviado ao GitHub, ele aparece com o nome e a foto de quem tem aquele e-mail cadastrado.
 
-\begin{enumerate}
-    \item \textbf{Abrir o terminal} (Prompt de Comando no Windows, Terminal no Mac/Linux)
-    
-    \item \textbf{Verificar se o Git está instalado:}
-    \begin{verbatim}
-    git --version
-    \end{verbatim}
-    \textit{Resultado esperado:} Deve aparecer algo como \texttt{git version 2.xx.x}
-    
-    \item \textbf{Verificar se o GitHub CLI está instalado:}
-    \begin{verbatim}
-    gh --version
-    \end{verbatim}
-    \textit{Resultado esperado:} Deve aparecer algo como \texttt{gh version 2.xx.x}
-\end{enumerate}
+\begin{conceito}[Assinatura de commit]
+Assinar um commit é anexar a ele uma \textbf{assinatura criptográfica} feita com uma chave privada que só você tem. Quem tem a sua chave \textbf{pública} consegue conferir que o commit veio de você e que não foi alterado depois. O GitHub faz essa conferência e mostra um selo ao lado do commit.
+\end{conceito}
 
-\subsection{Problemas Comuns e Soluções}
+\subsection*{Os selos}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l X@{}}
+\toprule
+\textbf{Selo} & \textbf{Significado} \\
+\midrule
+\color{verdeok}Verified & o commit está assinado e a assinatura foi conferida com uma chave cadastrada na conta \\
+\color{vermelhoerro}Unverified & o commit está assinado, mas a assinatura não pôde ser conferida (chave não cadastrada, e-mail diferente, chave de outra pessoa) \\
+\textrm{(sem selo)} & o commit não foi assinado \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{aviso}[O e-mail precisa bater]
+Para o selo \textbf{Verified}, o e-mail do commit (\comando{git config user.email}) precisa ser um e-mail \textbf{verificado} na sua conta do GitHub. No caso do GPG, ele também precisa estar dentro da chave. Essa é a causa mais comum de \enquote{Unverified}.
+\end{aviso}
+
+\section{GPG ou SSH?}
+
+Há dois jeitos de assinar, e os dois são aceitos pelo GitHub:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries\color{roxoescuro}}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+\toprule
+ & \textbf{GPG} & \textbf{SSH} \\
+\midrule
+Ferramenta & GnuPG (\comando{gpg}) & OpenSSH (\comando{ssh-keygen}), que já vem com o Git \\
+Requisito & GnuPG instalado & Git 2.34 ou mais novo \\
+Chave & uma chave própria, que carrega nome e e-mail & a mesma chave SSH do capítulo~\ref{cap:git} pode servir \\
+Validade & pode ter data de expiração embutida & sem data de expiração \\
+Conferir no terminal & direto, com o chaveiro do GPG & precisa de um arquivo \arq{allowed\_signers} \\
+Quando escolher & padrão consolidado, usado há muito tempo & mais simples para quem já usa SSH \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{dica}
+Escolha \textbf{um} dos dois e siga só a seção correspondente. Se não souber qual, comece pelo SSH: são menos passos.
+\end{dica}
+
+% -----------------------------------------------------------------------------
+\section{Assinando com GPG}
+
+\subsection{Instalar o GnuPG}
+
 \begin{itemize}
-    \item Se algum comando não for reconhecido, reinstale a ferramenta
-    \item No Windows, talvez seja necessário reiniciar o computador após a instalação
+  \item \textbf{Linux:} costuma vir instalado. Confira com \comando{gpg --version}. No Debian e no Ubuntu, se faltar: \comando{sudo apt install gnupg}.
+  \item \textbf{Windows:} o Git for Windows já traz um \comando{gpg} dentro do \textbf{Git Bash}. Use o Git Bash para todos os comandos desta seção.
 \end{itemize}
 
-\section{Criar um repositório no GitHub via CLI}
+\begin{aviso}[Windows: um GPG só]
+Se você também instalar o Gpg4win, passa a ter \textbf{dois} GPGs no computador, cada um com o próprio chaveiro. Uma chave criada num não aparece no outro, e o Git reclama de \enquote{No secret key}. Crie a chave e assine sempre pelo mesmo. Para saber qual o Git está usando, rode \comando{which gpg} no Git Bash.
+\end{aviso}
 
-\subsection{Objetivo}
-Criar um repositório público com descrição.
+\subsection{Passo 1 — Ver se você já tem uma chave}
 
-\subsection{Pré-requisito}
-Fazer login no GitHub CLI:
-\begin{verbatim}
-gh auth login
-\end{verbatim}
+\begin{bashcode}
+gpg --list-secret-keys --keyid-format=long
+\end{bashcode}
 
-\subsection{Passo a Passo}
+Se aparecer uma chave com o seu e-mail, pule para o passo 3.
+
+\subsection{Passo 2 — Gerar a chave}
+
+\begin{bashcode}
+gpg --full-generate-key
+\end{bashcode}
+
+O comando faz algumas perguntas:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.35}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Pergunta} & \textbf{O que responder} \\
+\midrule
+Tipo de chave & aperte \tecla{Enter} para aceitar o padrão. Nas versões novas é ECC (ed25519); nas antigas, \enquote{RSA e RSA}. O GitHub aceita os dois \\
+Tamanho & só aparece para RSA: digite \texttt{4096} \\
+Validade & \texttt{0} = não expira, que é o padrão recomendado pelo GitHub. Uma data (como \texttt{1y}, um ano) é mais segura, mas exige renovar a chave \\
+Nome e e-mail & o seu nome e \textbf{o mesmo e-mail verificado} no GitHub \\
+Senha & uma senha forte. Ela protege a chave se alguém copiar o seu computador \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Passo 3 — Descobrir o ID da chave}
+
+\begin{bashcode}
+gpg --list-secret-keys --keyid-format=long
+\end{bashcode}
+\begin{saida}
+sec   rsa4096/30F2B65B9246B6CA 2017-08-18 [SC]
+      D5E4F29F3275DC0CDA8FFC8730F2B65B9246B6CA
+uid                   [ultimate] Maria Exemplo <maria@exemplo.com>
+ssb   rsa4096/B7ABC0813E4028C0 2017-08-18 [E]
+\end{saida}
+
+O ID é o que vem \textbf{depois da barra} na linha \arq{sec}: aqui, \arq{30F2B65B9246B6CA}. Numa chave ECC, a linha começa com \arq{ed25519/}. O seu ID será outro.
+
+\subsection{Passo 4 — Exportar a chave pública}
+
+\begin{bashcode}
+gpg --armor --export 30F2B65B9246B6CA
+\end{bashcode}
+
+Copie \textbf{tudo}, da linha \arq{-----BEGIN PGP PUBLIC KEY BLOCK-----} até a linha \arq{-----END PGP PUBLIC KEY BLOCK-----}, incluindo as duas.
+
+\begin{aviso}[Pública, nunca privada]
+O que vai para o site é a chave \textbf{pública} (\comando{--export}). Nunca use \comando{--export-secret-keys} para isso. A chave privada não sai do seu computador.
+\end{aviso}
+
+\subsection{Passo 5 — Cadastrar no GitHub}
+
 \begin{enumerate}
-    \item \textbf{Criar o repositório:}
-    \begin{verbatim}
-    gh repo create meu-primeiro-repo --public 
-    --description "Meu primeiro repositório" --clone
-    \end{verbatim}
-    
-    \item \textbf{Entrar na pasta do repositório:}
-    \begin{verbatim}
-    cd meu-primeiro-repo
-    \end{verbatim}
+  \item Clique na sua foto (canto superior direito) \(\rightarrow\)\ \textbf{Settings}.
+  \item Na seção \textbf{Access}, clique em \textbf{SSH and GPG keys}.
+  \item Clique em \textbf{New GPG key}.
+  \item Em \textbf{Title}, dê um nome (por exemplo, \enquote{Notebook pessoal}). Em \textbf{Key}, cole o bloco copiado.
+  \item Clique em \textbf{Add GPG key}. O GitHub pode pedir a sua senha de novo.
 \end{enumerate}
 
-\subsection{README.md}
+\subsection{Passo 6 — Dizer ao Git qual chave usar}
 
-\subsubsection{O que é README.md}
+\begin{bashcode}
+git config --global user.signingkey 30F2B65B9246B6CA
+git config --global commit.gpgsign true     # assina todo commit
+git config --global tag.gpgSign true        # assina toda tag
+\end{bashcode}
+
+\begin{dica}[Já usou assinatura SSH antes?]
+Se algum dia configurou \comando{gpg.format ssh}, desfaça com \comando{git config --global --unset gpg.format}. Sem isso, o Git continua tentando assinar com SSH.
+\end{dica}
+
+\subsection{Passo 7 — Ensinar o GPG a pedir a senha no terminal}
+
+No Linux e no Git Bash, o GPG precisa saber em qual terminal pedir a senha da chave. Rode uma vez:
+
+\begin{bashcode}
+[ -f ~/.bashrc ] && echo -e '\nexport GPG_TTY=$(tty)' >> ~/.bashrc
+source ~/.bashrc
+\end{bashcode}
+
+Quem usa \textbf{zsh} coloca a linha \arq{export GPG\_TTY=\$(tty)} no \arq{\textasciitilde/.zshrc}.
+
+\subsection{Passo 8 — Testar}
+
+\begin{bashcode}
+git commit --allow-empty -m "Testando a assinatura"
+git log --show-signature -1
+\end{bashcode}
+\begin{saida}
+commit e55fbf5be5b86eb89737adea712d8c605b5f9529
+gpg: Assinatura feita seg 28 set 2026 14:51:16 -03
+gpg:                usando RSA chave 0D9FFCDB3C4EBDC3E7225C8CB4BEA86F1F6C7956
+gpg: Assinatura correta de "Maria Exemplo <maria@exemplo.com>" [final]
+Author: Maria Exemplo <maria@exemplo.com>
+\end{saida}
+
+A linha \enquote{Assinatura correta} (em inglês, \enquote{Good signature}) confirma que funcionou. Se você não ligou o \comando{commit.gpgsign}, assine um commit específico com \comando{git commit -S -m "..."}.
+
+% -----------------------------------------------------------------------------
+\section{Assinando com SSH}
+
+\subsection{Requisitos}
+
 \begin{itemize}
-    \item É a "cara" do seu projeto no GitHub
-    \item Explica o que seu projeto faz, como usar, etc.
-    \item Usa uma linguagem chamada Markdown (por isso o .md)
+  \item \textbf{Git 2.34 ou mais novo} (\comando{git --version});
+  \item \textbf{OpenSSH 8.1 ou mais novo} (\comando{ssh -V}). A versão 8.7 tem a assinatura quebrada: nela, atualize para a 8.8 ou mais nova;
 \end{itemize}
 
-\subsubsection{Como Criar}
+\subsection{Passo 1 — Ter uma chave SSH}
+
+Se você fez o login por SSH no capítulo~\ref{cap:git}, já tem uma: normalmente \arq{\textasciitilde/.ssh/id\_ed25519.pub}. Se não tiver, crie:
+
+\begin{bashcode}
+ssh-keygen -t ed25519 -C "maria@exemplo.com"
+\end{bashcode}
+
+Aperte \tecla{Enter} para aceitar o local padrão e escolha uma senha. O arquivo terminado em \arq{.pub} é a chave \textbf{pública}. O outro, sem extensão, é a \textbf{privada}, e nunca sai do seu computador.
+
+\subsection{Passo 2 — Dizer ao Git para assinar com SSH}
+
+\begin{bashcode}
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global commit.gpgsign true
+git config --global tag.gpgSign true
+\end{bashcode}
+
+\subsection{Passo 3 — Cadastrar como chave de assinatura no GitHub}
+
 \begin{enumerate}
-    \item \textbf{Criar o arquivo:}
-    \begin{verbatim}
-    echo "# Meu Primeiro Projeto" >> README.md
-    \end{verbatim}
-    
-    \item \textbf{Adicionar conteúdo:}
-    \begin{verbatim}
-    # Meu Primeiro Projeto
-     
-    Este é meu primeiro repositório no GitHub!
-     
-    ## O que este projeto faz?
-     
-    - Aprender Git e GitHub
-    - Praticar comandos
-    - Compartilhar conhecimento
-     
-    ## Como usar?
-     
-    1. Clone este repositório
-    2. Siga as instruções
-    3. Aprenda!
-    \end{verbatim}
-    
-    \item \textbf{Salvar e enviar para o GitHub:}
-    \begin{verbatim}
-    git add README.md
-    git commit -m "docs(readme): Adiciona README com 
-    a descrição do projeto"
-    git push origin main
-    \end{verbatim}
-    Em \texttt{git push origin main}, pode ser colocado a flag \texttt{-u}, ou seja, \texttt{git push -u origin main} isso precisará ser feito apenas uma vez os próximos pushes poderão apenas se fazer com \texttt{git push}.
-    A flag -u faz com que o git se torne um colaborador do repositório, ou seja, ele não precisa mais digitar origin e main, ele já sabe que é o repositório principal.
+  \item Foto \(\rightarrow\)\ \textbf{Settings} \(\rightarrow\)\ \textbf{SSH and GPG keys} \(\rightarrow\)\ \textbf{New SSH key}.
+  \item Em \textbf{Title}, dê um nome. Em \textbf{Key type}, escolha \textbf{Signing Key}.
+  \item Em \textbf{Key}, cole o conteúdo do arquivo \arq{.pub} (\comando{cat \textasciitilde/.ssh/id\_ed25519.pub}) e clique em \textbf{Add SSH key}.
 \end{enumerate}
 
-\subsection{LICENSE}
+\begin{aviso}[No GitHub, a mesma chave entra duas vezes]
+Uma chave cadastrada como \emph{Authentication Key} serve para \comando{git push}, mas \textbf{não} para verificar assinaturas. Se quiser usar a mesma chave para as duas coisas, cadastre-a duas vezes: uma com cada tipo.
+\end{aviso}
 
-\subsubsection{Por que usar LICENSE}
+Pelo terminal, com o GitHub CLI, dá no mesmo. A opção \comando{--type} existe nas versões do \comando{gh} lançadas a partir de 2023. Se a sua recusar a opção, use a página web.
+
+\begin{bashcode}
+gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "Notebook pessoal"
+\end{bashcode}
+
+\subsection{Passo 4 — Permitir a conferência no seu computador}
+
+O GitHub confere a assinatura sozinho. Mas, para o \emph{seu} Git conferir, ele precisa de uma lista de chaves confiáveis. Sem ela, aparece:
+
+\begin{saida}
+error: gpg.ssh.allowedSignersFile needs to be configured and exist for ssh signature verification
+\end{saida}
+
+Crie a lista uma vez:
+
+\begin{bashcode}
+touch ~/.ssh/allowed_signers
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+echo "$(git config --get user.email) namespaces=\"git\" $(cat ~/.ssh/id_ed25519.pub)" >> ~/.ssh/allowed_signers
+\end{bashcode}
+
+Cada linha do arquivo associa um e-mail a uma chave. O \arq{namespaces="git"} limita a chave a assinaturas do Git.
+
+\subsection{Passo 5 — Testar}
+
+\begin{bashcode}
+git commit --allow-empty -m "Testando a assinatura SSH"
+git log --show-signature -1
+\end{bashcode}
+\begin{saida}
+commit 86613eb51dee51c80a61f2cf8f1532df427e60c5
+Good "git" signature for maria@exemplo.com with ED25519 key SHA256:Z/dW7mOFmUlo/Po1CSObYXoO3bAPY2bTohQtnJY0PGc
+Author: Maria Exemplo <maria@exemplo.com>
+\end{saida}
+
+% -----------------------------------------------------------------------------
+\section{Conferindo no GitHub}
+
+Envie um commit assinado com \comando{git push} e abra a lista de commits:
+
 \begin{itemize}
-    \item Define como outras pessoas podem usar seu código
-    \item Protege seus direitos autorais
-    \item Torna seu projeto mais profissional
+  \item Na aba \textbf{Commits} do repositório, o selo \textbf{Verified} aparece ao lado do commit. Clique nele para ver qual chave assinou.
 \end{itemize}
 
-\subsubsection{Como Adicionar Licença MIT}
-\begin{enumerate}
-    \item \textbf{Criar arquivo LICENSE:}
-    \begin{verbatim}
-    touch LICENSE
-    \end{verbatim}
-    
-    \item \textbf{Adicionar conteúdo da licença MIT:}
-    \begin{lstlisting}[caption={Licença MIT},label=lst:mit-license]
-    MIT License
+No terminal, uma letra resume o estado de cada commit:
 
-    Copyright (c) [ano] [seu nome]
+\begin{bashcode}
+git log --format='%h %G? %s'
+\end{bashcode}
 
-    Permission is hereby granted, free of charge, to any person 
-    obtaining a copy of this software and associated documentation 
-    files (the "Software"), to deal in the Software without 
-    restriction, including without limitation the rights to use, 
-    copy, modify, merge, publish, distribute, sublicense, and/or 
-    sell copies of the Software, and to permit persons to whom 
-    the Software is furnished to do so, subject to the following 
-    conditions:
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{0.9\linewidth}{@{}>{\ttfamily\bfseries\color{roxoescuro}}l X@{}}
+\toprule
+G & assinatura válida \\
+N & sem assinatura \\
+B & assinatura inválida \\
+E & não foi possível conferir (por exemplo, falta a chave pública ou o \arq{allowed\_signers}) \\
+\bottomrule
+\end{tabularx}
+\end{center}
 
-    The above copyright notice and this permission notice shall 
-    be included in all copies or substantial portions of the Software.
+\begin{dica}[Vigilant mode no GitHub]
+Em \textbf{Settings \(\rightarrow\)\ SSH and GPG keys}, a opção \textbf{Vigilant mode} (\enquote{Flag unsigned commits as unverified}) faz o GitHub marcar como \textbf{Unverified} todo commit seu que não esteja assinado, inclusive os que alguém fizer se passando por você. Ligue só depois que todos os seus computadores estiverem assinando.
+\end{dica}
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
-    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
-    OTHER DEALINGS IN THE SOFTWARE.
-    \end{lstlisting}
-    
-    \item \textbf{Substituir \texttt{[ano]} e \texttt{[seu nome]} pelos seus dados}
-    
-    \item \textbf{Salvar e enviar:}
-    \begin{verbatim}
-    git add LICENSE
-    git commit -m "chore(licensing):Adiciona licença MIT"
-    git push origin main
-    \end{verbatim}
-\end{enumerate}
+% -----------------------------------------------------------------------------
+\section{Cuidados com a chave}
 
-\section{Clonando um repositório do GitHub}
-
-\subsection{Objetivo}
-Aprender a baixar repositórios existentes.
-
-\subsection{Passo a Passo}
-\begin{enumerate}
-    \item \textbf{Repositório alvo: https://github.com/ronidomingues/github-capacitation}
-    
-    \item \textbf{Copiar a URL do repositório}
-    
-    \item \textbf{No terminal, clonar:}
-    \begin{verbatim}
-    git clone https://github.com/ronidomingues/
-    github-capacitation.git
-    \end{verbatim}
-    
-    \item \textbf{Entrar na pasta criada:}
-    \begin{verbatim}
-    cd github-capacitation
-    \end{verbatim}
-    
-    \item \textbf{Verificar o conteúdo:}
-    \begin{verbatim}
-    ls -la
-    \end{verbatim}
-\end{enumerate}
-
-\section{Github Pages}
-
-\subsection{Objetivo}
-Publicar um site gratuitamente.
-
-\subsection{Passo a Passo}
-\begin{enumerate}
-    \item \textbf{Criar novo repositório:}
-    \begin{verbatim}
-    gh repo create meu-site --public 
-    --description "Meu primeiro site" --clone
-    cd meu-site
-    \end{verbatim}
-    
-    \item \textbf{Copiar os arquivos do jogo} (HTML, CSS, JS) para a pasta do repositório
-    
-    \item \textbf{Verificar estrutura:}
-    \begin{verbatim}
-    ls -la
-    \end{verbatim}
-    
-    \item \textbf{Adicionar, commitar e enviar:}
-    \begin{verbatim}
-    git add .
-    git commit -m "feat(jogo): adiciona arquivos do jogo"
-    git push origin main
-    \end{verbatim}
-    
-    \item \textbf{Ativar GitHub Pages:}
-    \begin{itemize}
-        \item No GitHub, vá em \textbf{Settings} → \textbf{Pages}
-        \item Em \textbf{Source}, selecione \textbf{main branch}
-        \item Clique \textbf{Save}
-    \end{itemize}
-    
-    \item \textbf{Acessar seu site:}
-    \begin{itemize}
-        \item URL será: \texttt{https://seu-usuario.github.io/meu-site}
-    \end{itemize}
-\end{enumerate}
-
-\section{Github Actions}
-
-\subsection{Objetivo}
-Automatizar execução de código Python.
-
-\subsection{Passo a Passo}
-\begin{enumerate}
-    \item \textbf{Criar repositório para o código Python:}
-    \begin{verbatim}
-    gh repo create meu-script-python --public 
-    --description "Script Python com GitHub Actions" --clone
-    cd meu-script-python
-    \end{verbatim}
-    
-    \item \textbf{Copiar o arquivo Python fornecido para o repositório}
-    
-    \item \textbf{Criar pasta para workflows:}
-    \begin{verbatim}
-    mkdir -p .github/workflows
-    \end{verbatim}
-    
-    \item \textbf{Criar arquivo de workflow:}
-    \begin{verbatim}
-    touch .github/workflows/python.yml
-    \end{verbatim}
-    
-    \item \textbf{Adicionar conteúdo ao workflow - Prencher o que falta:}
-    \par
-    Há um miodelo com \texttt{fortran 90}, disponível na pasta materials.
-    \begin{verbatim}
-        name: "Executar script Python e Commitar resultado"
-
-        on:
-          push:
-            branches: [ main ]
-          workflow_dispatch:
-
-        jobs:
-          build-run:
-            runs-on: ubuntu-latest
-            steps:
-                # 1️⃣ Faz o clone do repositório para a VM Ubuntu;
-                # 2️⃣ Configura o Python a ser usado pela VM;
-                -name: Instalar Python3
-                uses: actions/setup-python@v5
-                with:
-                  python-version: '3.x'
-                # 3️⃣ Executa o script Python;
-                # 4️⃣ Cria um commit com o resultado;
-                -name: Commitar PDFs gerados
-                run: |
-                    git config user.name "github-actions[bot]"
-                    git config user.email "github-actions
-                    [bot]@users.noreply.github.com"
-                    git add materials/*.pdf
-                    git commit -m "Atualizar PDFs compilados
-                    automaticamente [skip ci]" || echo "Nenhuma
-                    alteração para commitar"
-                    git push
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    \end{verbatim}
-    \subsection{Uso de \texttt{[skip ci]} no GitHub Actions}
-
-No GitHub Actions, um workflow normalmente é disparado por eventos como:
-
-\begin{verbatim}
-on:
-  push:
-    branches:
-      - main
-\end{verbatim}
-
-Ou seja, \textbf{cada \texttt{git push}} aciona o workflow.  
-
-Quando o próprio workflow realiza um commit e push automaticamente (por exemplo, atualizando arquivos gerados ou listas), isso poderia disparar o workflow novamente, criando um \textbf{loop infinito}.  
-
-Para evitar esse problema, é possível incluir no commit uma anotação especial:
-
-\begin{verbatim}
-git commit -m "Atualiza lista automática [skip ci]"
-\end{verbatim}
-
-O código \texttt{[skip ci]} instrui o GitHub Actions (e outros sistemas de CI, como GitLab CI ou Travis CI) a \textbf{ignorar este commit}, ou seja, não disparar nenhum workflow.  
-
-Dessa forma, o workflow pode atualizar arquivos ou fazer commits automaticamente sem reiniciar seu próprio processo indefinidamente.  
-
-\textbf{Observação:} Além de \texttt{[skip ci]}, também é possível usar \texttt{[ci skip]}, que possui a mesma função.
-
-    \item \textbf{Adicionar, commitar e enviar tudo:}
-    \begin{verbatim}
-    git add .
-    git commit -m "feat:Adiciona script Python e GitHub Actions"
-    git push origin main
-    \end{verbatim}
-    
-    \item \textbf{Verificar execução:}
-    \begin{itemize}
-        \item No GitHub, vá em \textbf{Actions} para ver o workflow rodando
-    \end{itemize}
-\end{enumerate}
-
-\section{Merge}
-
-\subsection{Objetivo}
-Aprender a juntar alterações de diferentes origens.
-
-\subsection{Passo a Passo}
-\begin{enumerate}
-    \item \textbf{Fazer alteração REMOTA:}
-    \begin{itemize}
-        \item No GitHub, edite o README.md online
-        \item Adicione uma linha no final
-        \item Commit a alteração
-    \end{itemize}
-    
-    \item \textbf{Fazer alteração LOCAL:}
-    \begin{verbatim}
-    # No seu computador, no mesmo repositório
-    echo "Alteração local" >> arquivo-local.txt
-    git add arquivo-local.txt
-    git commit -m "Adiciona arquivo local"
-    \end{verbatim}
-    
-    \item \textbf{Tentar enviar alteração local:}
-    \begin{verbatim}
-    git push origin main
-    # VAI DAR ERRO! Porque tem alteração remota 
-    # que você não tem localmente
-    \end{verbatim}
-    
-    \item \textbf{Fazer merge:}
-    \begin{verbatim}
-    git pull origin main
-    # Isso baixa as alterações remotas e faz merge 
-    # com suas alterações locais
-    \end{verbatim}
-    
-    \item \textbf{Resolver conflitos (se houver):}
-    \begin{itemize}
-        \item Se Git não conseguir juntar automaticamente, ele pedirá para resolver manualmente
-        \item Abra os arquivos com conflitos, resolva e depois:
-        \begin{verbatim}
-        git add .
-        git commit -m "Resolve conflitos de merge"
-        git push origin main
-        \end{verbatim}
-    \end{itemize}
-\end{enumerate}
-
-\section{Pull Request}
-
-\subsection{Objetivo}
-Contribuir para projetos de outras pessoas.
-
-\subsection{Passo a Passo}
-\begin{enumerate}
-    \item \textbf{Fork do repositório original:}
-    \begin{itemize}
-        \item No GitHub, vá para o repositório \url{https://github.com/ronidomingues/github-capacitation}
-        \item Clique em \textbf{Fork} (canto superior direito)
-        \item Isso cria uma cópia em sua conta
-    \end{itemize}
-    
-    \item \textbf{Clonar SEU fork:}
-    \begin{verbatim}
-    git clone https://github.com/seu-usuario/
-    repositorio-forkado.git
-    cd repositorio-forkado
-    \end{verbatim}
-    
-    \item \textbf{Criar branch para sua feature:}
-    \begin{verbatim}
-    git checkout -b minha-feature
-    \end{verbatim}
-    
-    \item \textbf{Fazer suas alterações:}
-    \par Entre na pasta \texttt{presences} e adicione um arquivo \texttt{.txt} com o seu nome, por exemplo \texttt{roni.txt}, esse arquivo não precisa ter nenhum conteúdo, mas se queiser deixar uma avaliação de tudo até aqui será ótimo $\left. ;- \right)$.
-    \begin{verbatim}
-    echo "Minha avaliacao" >> presences/meu-nome.txt
-    \end{verbatim}
-    
-    \item \textbf{Commit e push:}
-    \begin{verbatim}
-    git add .
-    git commit -m "<tipo>(escopo): <descrição>"
-    git push origin minha-feature
-    \end{verbatim}
-    
-    \item \textbf{Criar Pull Request:}
-    \begin{itemize}
-        \item No GitHub, vá para SEU fork
-        \item Clique em \textbf{Pull Request} → \textbf{New Pull Request}
-        \item Selecione: base (repositório original) ← compare (sua branch)
-        \item Descreva suas alterações
-        \item Clique \textbf{Create Pull Request}
-    \end{itemize}
-\end{enumerate}
-
-\section{Materiais de Apoio}
-
-\subsection{Checklist para Cada Exercício}
 \begin{itemize}
-    \item [$\square$] Comandos executados sem erro
-    \item [$\square$] Arquivos criados corretamente
-    \item [$\square$] Commits com mensagens descritivas
-    \item [$\square$] Push realizado com sucesso
-    \item [$\square$] Resultado verificado no GitHub
+  \item \textbf{Guarde a chave privada e a senha.} Se perder a chave, é só criar outra e cadastrar, mas perde-se a continuidade.
+  \item \textbf{Chave vazou? Remova-a da conta e cadastre outra.} No GitHub, a verificação é registrada no momento do push: os commits antigos \textbf{continuam Verified} mesmo que a chave seja removida, expire ou seja revogada.
+  \item \textbf{Commits feitos pela interface web} já saem assinados pela própria plataforma.
+  \item No GitHub, um Pull Request integrado com \textbf{Rebase and merge} reescreve os commits, e eles perdem a sua assinatura.
+  \item \textbf{Não é preciso publicar a chave em servidor de chaves} (\emph{keyserver}). Alguns tutoriais pedem isso, mas o GitHub só usa a chave cadastrada na conta.
 \end{itemize}
 
-\subsection{Comandos Úteis para Consulta}
-\begin{verbatim}
-# Status do repositório
-git status
+\section{Problemas comuns}
 
-# Ver histórico de commits
-git log --oneline
+\begin{center}
+\renewcommand{\arraystretch}{1.4}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\ttfamily\footnotesize}p{5.6cm} >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textrm{\textbf{Mensagem ou sintoma}} & \textbf{O que fazer} \\
+\midrule
+error: gpg failed to sign the data & quase sempre é o \arq{GPG\_TTY} (passo 7 do GPG). Confira também se o \arq{user.signingkey} bate com \comando{gpg --list-secret-keys} \\
+gpg: signing failed: Inappropriate ioctl for device & falta o \arq{export GPG\_TTY=\$(tty)} \\
+No secret key / secret key not available & o ID configurado não existe neste chaveiro. No Windows, confira se o Git usa o mesmo GPG em que a chave foi criada \\
+gpg.ssh.allowedSignersFile needs to be configured and exist for ssh signature verification & crie o \arq{allowed\_signers} (passo 4 do SSH). A assinatura em si está certa \\
+either user.signingkey or gpg.ssh.defaultKeyCommand needs to be configured & falta o \comando{git config --global user.signingkey} \\
+\textrm{Selo \textbf{Unverified} no site} & o e-mail do commit não está verificado na conta, a chave não foi cadastrada, ou a chave SSH foi cadastrada só como \emph{Authentication Key} \\
+\bottomrule
+\end{tabularx}
+\end{center}
 
-# Ver diferenças
-git diff
-
-# Ver configuração
-git config --list
-\end{verbatim}
-
-\subsection{Dicas para Boas Práticas}
-\begin{itemize}
-    \item Commits frequentes e pequenos
-    \item Mensagens de commit claras e descritivas
-    \item Sempre fazer pull antes de push
-    \item Testar localmente antes de enviar
-    \item Revisar código antes de criar PR
-\end{itemize}
+\begin{dica}[Fontes oficiais]
+Os passos deste capítulo seguem a documentação do GitHub \cite{github_assinatura}. Os nomes dos botões podem mudar com novas versões do site.
+\end{dica}

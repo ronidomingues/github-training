@@ -1,109 +1,193 @@
-\chapter{Assinaturas de Commits com chave GPG}
+% ======================================================================
+\chapter{GitHub Pages e GitHub Actions}
+\label{cap:pages}
+% ======================================================================
 
-\section{O que é?}
-A assinatura de commits com \textbf{GPG (GNU Privacy Guard)} é um recurso do Git que permite garantir a autenticidade e a integridade das alterações feitas em um repositório. Quando um commit é assinado, outras pessoas podem verificar que aquele commit foi realmente feito por você, evitando alterações fraudulentas ou commits não autorizados.
+\section{GitHub Pages: um site a partir do repositório}
 
-\subsection{Importância das assinaturas GPG}
-\begin{itemize}
-    \item \textbf{Segurança:} Confirma que o commit foi feito pelo autor legítimo.
-    \item \textbf{Integridade:} Permite verificar se o commit não foi alterado após sua criação.
-    \item \textbf{Transparência:} Em projetos open source, facilita identificar contribuições confiáveis.
-\end{itemize}
-
-\section{Como usar?}
-
-\subsection{Passo 1: Instalar o GPG}
-Antes de assinar commits, você precisa instalar o GPG no seu sistema.
+O \textbf{GitHub Pages} hospeda \textbf{sites estáticos} (HTML, CSS e
+JavaScript) direto de um repositório, de graça, no endereço
+\texttt{https://<seu-usuario>.github.io/<repositorio>/}
+\cite{github_pages}.
 
 \begin{itemize}
-    \item \textbf{Linux/Debian:}
-    \begin{verbatim}
-sudo apt update
-sudo apt install gnupg
-    \end{verbatim}
-
-    \item \textbf{Windows:} Instale o Gpg4win (\url{https://www.gpg4win.org/})
-
-    \item \textbf{MacOS:} 
-    \begin{verbatim}
-brew install gnupg
-    \end{verbatim}
+  \item Em repositório \textbf{público}, funciona em qualquer conta. Em
+        repositório \textbf{privado}, exige o GitHub Pro (que vem com os
+        benefícios de estudante, capítulo~\ref{cap:github}).
+  \item Aceita domínio próprio, além do \texttt{github.io}.
+  \item Não roda código no servidor: nada de PHP, banco de dados ou Python do
+        lado do servidor.
 \end{itemize}
 
-\subsection{Passo 2: Gerar uma chave GPG}
-Para criar uma chave GPG pessoal, use o comando:
+\subsection{As duas formas de publicar}
 
-\begin{verbatim}
-gpg --full-generate-key
-\end{verbatim}
+A escolha fica em \menu{Settings} \(\rightarrow\) \menu{Pages}
+\(\rightarrow\) \menu{Build and deployment} \(\rightarrow\) \menu{Source}:
 
-O terminal fará algumas perguntas:
-\begin{enumerate}
-    \item Tipo de chave: selecione \texttt{RSA and RSA (default)}.
-    \item Tamanho da chave: recomendo \texttt{4096 bits} para maior segurança.
-    \item Validade da chave: escolha o período de validade ou \texttt{0} para sem expiração.
-    \item Nome e e-mail: use o mesmo e-mail configurado no Git (\texttt{git config user.email}).
-    \item Senha: defina uma senha segura para proteger sua chave.
-\end{enumerate}
+\begin{table}[H]
+  \centering
+  \caption{Fontes de publicação do GitHub Pages}
+  \label{tab:pages_fontes}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    \textbf{Source} & \textbf{Quando usar} \\
+    \midrule
+    \menu{Deploy from a branch} & o site já está pronto no repositório: basta
+      escolher a branch (por exemplo, \texttt{main}) e a pasta
+      (\texttt{/(root)} ou \texttt{/docs}) \\
+    \menu{GitHub Actions} & o site precisa ser gerado antes de publicar, ou
+      você quer controlar o que é publicado. É o caminho recomendado pela
+      documentação atual \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
-\subsection{Passo 3: Listar chaves e copiar o ID da chave}
-Para ver as chaves criadas:
+\begin{aviso}[O index.html precisa estar na pasta publicada]
+O Pages abre o \arq{index.html} da pasta escolhida. Se ele estiver dentro de
+uma subpasta (por exemplo, \arq{jogo-da-memoria/index.html}), o endereço
+principal responde com erro 404.
+\end{aviso}
 
-\begin{verbatim}
-gpg --list-secret-keys --keyid-format LONG
-\end{verbatim}
+% ----------------------------------------------------------------------
+\section{GitHub Actions: automação dentro do GitHub}
+% ----------------------------------------------------------------------
 
-O resultado terá um formato como:
-\begin{verbatim}
-sec   rsa4096/ABCDEF1234567890 2025-01-01 [SC]
-      Key fingerprint = 1234 5678 9ABC DEF0 1234
-      5678 9ABC DEF0 1234 5670
-uid                 Seu Nome <seuemail@example.com>
-\end{verbatim}
+O \textbf{GitHub Actions} executa tarefas automaticamente quando algo acontece
+no repositório: rodar testes a cada push, compilar um projeto, publicar um
+site \cite{github_actions}.
 
-O que você precisa é do \textbf{ID da chave}, que no exemplo acima é \texttt{ABCDEF1234567890}.
+\begin{table}[H]
+  \centering
+  \caption{Vocabulário do GitHub Actions}
+  \label{tab:actions_termos}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    \textbf{Termo} & \textbf{O que é} \\
+    \midrule
+    Workflow & o processo automatizado, descrito num arquivo YAML em
+      \arq{.github/workflows/} \\
+    Evento (\texttt{on}) & o que dispara o workflow: um \texttt{push}, um Pull
+      Request, um horário, um clique manual (\texttt{workflow\_dispatch}) \\
+    Job & um conjunto de passos que roda numa mesma máquina \\
+    Step & um passo: um comando (\texttt{run}) ou uma ação pronta
+      (\texttt{uses}) \\
+    Runner & a máquina virtual do GitHub que executa o job, como
+      \texttt{ubuntu-latest} \\
+    Action & um passo pronto e reutilizável, como
+      \texttt{actions/checkout} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
-\subsection{Passo 4: Configurar o Git para usar a chave GPG}
-Diga ao Git qual chave usar para assinar commits:
+\begin{dica}[Minutos]
+Em repositórios \textbf{públicos}, o GitHub Actions é gratuito. Em privados,
+os minutos por mês dependem do plano (tabela~\ref{tab:free_pro}).
+\end{dica}
 
-\begin{verbatim}
-git config --global user.signingkey ABCDEF1234567890
-git config --global commit.gpgsign true
-\end{verbatim}
+\subsection{Exemplo 1: publicar um site pelo Actions}
 
-\subsection{Passo 5: Adicionar a chave GPG ao GitHub}
-Para que o GitHub reconheça seus commits assinados:
-\begin{enumerate}
-    \item Copie a chave pública:
-    \begin{verbatim}
-gpg --armor --export ABCDEF1234567890
-    \end{verbatim}
-    \item Entre no GitHub: \texttt{Settings > SSH and GPG keys > New GPG key}
-    \item Cole a chave pública e salve.
-\end{enumerate}
+Salve como \arq{.github/workflows/pages.yml} e, em \menu{Settings}
+\(\rightarrow\) \menu{Pages}, escolha a Source \menu{GitHub Actions}:
 
-\subsection{Passo 6: Fazer commits assinados}
-A partir de agora, todos os commits serão assinados automaticamente. Você também pode assinar commits individualmente:
+\begin{yamlcode}
+name: Publicar o site
 
-\begin{verbatim}
-git commit -S -m "Mensagem do commit"
-\end{verbatim}
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
-No GitHub, os commits assinados aparecerão com a etiqueta \textbf{Verified}.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-\subsection{Passo 7: Verificar commits assinados}
-Para verificar um commit localmente, use:
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
-\begin{verbatim}
-git log --show-signature
-\end{verbatim}
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v5
+\end{yamlcode}
 
-O Git mostrará se o commit foi assinado corretamente e qual chave foi usada.
+O \texttt{path: .} publica a raiz do repositório. Se o site estiver numa
+subpasta, troque pelo caminho dela.
 
-\section{Dicas de segurança e boas práticas}
-\begin{itemize}
-    \item Proteja sua chave GPG com uma senha forte.
-    \item Faça backup da chave privada em um local seguro.
-    \item Não compartilhe sua chave privada.
-    \item Rotacione suas chaves periodicamente, se necessário.
-\end{itemize}
+\subsection{Exemplo 2: rodar um script e guardar o resultado}
+
+Este workflow roda o \arq{main.py} (disponível em \arq{materials/}), que cria
+um arquivo \arq{resultado.txt}, e grava esse arquivo de volta no repositório:
+
+\begin{yamlcode}
+name: Executar o script Python
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # necessário para o git push no último passo
+
+jobs:
+  executar:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Baixa o repositório para a máquina do GitHub
+      - uses: actions/checkout@v7
+
+      # 2. Instala o Python
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      # 3. Roda o script, que cria o resultado.txt
+      - name: Executar o main.py
+        run: python main.py
+
+      # 4. Grava o resultado no repositório
+      - name: Commitar o resultado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add resultado.txt
+          git commit -m "chore: atualiza o resultado.txt" || echo "Nada para commitar"
+          git push
+\end{yamlcode}
+
+\begin{aviso}[Sem permissão, o push falha]
+Por padrão, o token que o workflow recebe (\texttt{GITHUB\_TOKEN}) pode ser
+só de leitura. Sem o \texttt{permissions: contents: write}, o
+\texttt{git push} do último passo falha com erro 403.
+\end{aviso}
+
+\subsection{E o \texttt{[skip ci]}?}
+
+Poderia parecer que o push feito pelo próprio workflow dispara o workflow de
+novo, num laço infinito. \textbf{Não dispara}: pushes feitos com o
+\texttt{GITHUB\_TOKEN} não iniciam novos workflows. O \texttt{[skip ci]} na
+mensagem do commit (ou \texttt{[ci skip]}, \texttt{[no ci]},
+\texttt{[skip actions]}) só é necessário quando o push é feito com um token
+pessoal ou de aplicativo \cite{github_skip}.
+
+\subsection{Acompanhando}
+
+A aba \menu{Actions} do repositório mostra cada execução, com o log de cada
+passo. Pelo terminal:
+
+\begin{bashcode}
+gh run list          # últimas execuções
+gh run watch         # acompanha a execução em andamento
+\end{bashcode}

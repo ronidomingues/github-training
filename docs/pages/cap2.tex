@@ -1,26 +1,37 @@
-\chapter{GitHub}
-\par
-\section{O que é?}
-O GitHub é uma plataforma de hospedagem de código-fonte que utiliza o sistema de controle de versão Git. Ele permite que desenvolvedores colaborem em projetos, compartilhem código e gerenciem alterações de forma eficiente. Com o GitHub, é possível criar repositórios, realizar pull requests, revisar código e acompanhar o histórico de alterações.
-\par
-Além disso, o GitHub oferece recursos adicionais, como GitHub Pages para hospedagem de sites estáticos, GitHub Actions para automação de fluxos de trabalho e integração com diversas ferramentas de desenvolvimento.
-\par
-O GitHub é amplamente utilizado na indústria de software, sendo uma ferramenta essencial para desenvolvedores, equipes de desenvolvimento e organizações que buscam melhorar a colaboração e a gestão de projetos de software.
-\par
-\section{Criando seu perfil no GitHub}
-Para criar uma conta no GitHub, siga os passos abaixo:
+% ======================================================================
+\chapter{A conta no GitHub}
+\label{cap:github}
+% ======================================================================
+
+\section{O que é o GitHub}
+
+\begin{conceito}[Git e GitHub não são a mesma coisa]
+O \textbf{Git} é um programa de controle de versão que roda no seu computador.
+O \textbf{GitHub} é uma plataforma na internet que hospeda repositórios Git e
+acrescenta o que uma equipe precisa para colaborar: revisão de código (Pull
+Requests), controle de acesso, Issues, publicação de sites (GitHub Pages) e
+automação (GitHub Actions).
+\end{conceito}
+
+O Git funciona sozinho, sem internet. O GitHub entra quando é preciso
+compartilhar o trabalho, revisar o de outras pessoas ou publicar algo.
+
+\section{Criando a conta}
+
 \begin{enumerate}
-  \item Acesse o site do GitHub: \url{https://github.com/}
-  \item Clique em "Sign up" no canto superior direito.
-  \item Preencha os campos solicitados, como endereço de e-mail, nome de usuário e senha - Figura \ref{fig:signup_page}, p.\pageref{fig:signup_page}.
+  \item Acesse \url{https://github.com} e clique em \menu{Sign up}.
+  \item Informe e-mail, senha e nome de usuário
+        (Figura~\ref{fig:signup_page}). O nome de usuário aparece em todos os
+        seus endereços, como \texttt{github.com/seu-usuario}: escolha um que
+        você use profissionalmente.
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{./assets/images/01_signup_page.png}
-    \caption{Página para a criação de conta no GitHub}
+    \caption{Página de criação de conta no GitHub}
     \label{fig:signup_page}
   \end{figure}
-  \item Siga as instruções na tela para concluir o processo de criação da conta.
-  \item Ao final você verá a tela inicial do GitHub - Figura \ref{fig:signed_page}, p.\pageref{fig:signed_page}.
+  \item Confirme o e-mail pelo código enviado e conclua as telas seguintes. Ao
+        final, você verá a página inicial (Figura~\ref{fig:signed_page}).
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{./assets/images/02_signed_page.png}
@@ -28,86 +39,147 @@ Para criar uma conta no GitHub, siga os passos abaixo:
     \label{fig:signed_page}
   \end{figure}
 \end{enumerate}
-\par
-Após criar a conta, você poderá acessar o GitHub e começar a explorar seus recursos.
-\par
-\subsection{E-mail acadêmico e GitHub Student Developer Pack}
-Para usar o GitHub Student Developer Pack e tornar sua conta uma GitHub Pro, você deve associar um e-mail acadêmico à sua conta. Isso pode ser feito nas configurações da conta, na seção "Emails". Adicionar um e-mail acadêmico pode ajudar a validar sua identidade como estudante ou profissional da área de tecnologia.
-\par
-Com isso o GitHub Student Developer Pack fornece acesso gratuito a diversas ferramentas e serviços para estudantes. Para se inscrever, você precisará verificar seu status de estudante com um e-mail acadêmico válido.
-\par
-\subsubsection{Por que usar o GitHub Student Developer Pack?}
-O GitHub Student Developer Pack oferece uma série de benefícios, incluindo acesso gratuito a ferramentas de desenvolvimento, serviços de hospedagem e outros recursos que podem ser extremamente úteis para estudantes que estão aprendendo a programar e desenvolver software.
-\par
-\subsubsection{GitHub Free vs GitHub Student Developer Pack (GSDP)}
-A conta gratuita do GitHub oferece recursos básicos, como repositórios públicos e privados, colaboração em projetos e integração com outras ferramentas. Já a conta GitHub Student Developer Pro oferece benefícios adicionais, como acesso a ferramentas premium, maior capacidade de armazenamento e recursos avançados de colaboração.
-\par
-\newpage
-\subsubsection{GitHub Free vs GSDP}
-\begin{table}[h!]
-    \centering
-    \begin{tabularx}{\textwidth}{|p{3cm}|p{3cm}|p{3cm}|X|}
-        \hline
-        \textbf{Recurso / Limite} & \textbf{GitHub Free (Conta Pessoal)} & \textbf{GitHub Student Developer Pack (GSDP)} & \textbf{Diferencial Estratégico} \\
-        \hline
-        Acesso a Repositórios Privados & Ilimitado (Recursos Limitados) & Ilimitado (Recursos Pro/Avançados) & Governança de Código \\
-        \hline
-        Minutos do GitHub Actions (Mensal) & 2,000 minutos & 3,000 minutos & Maior Resiliência de CI/CD (+50\%) \\
-        \hline
-        Armazenamento de Packages & 500 MB & 2 GB & Suporte a Artefatos e Contêineres (+400\%) \\
-        \hline
-        Horas de Core do Codespaces (Mensal) & 120 horas & 180 horas & Desenvolvimento em Nuvem Estendido \\
-        \hline
-        Armazenamento Codespaces (Mensal) & 15 GB & 20 GB & Maior Capacidade de Workspace \\
-        \hline
-        Revisores Obrigatórios (Private Repos) & Não Disponível & Disponível (Recurso Pro) & Enforçamento de Qualidade e Compliance \\
-        \hline
-        Suporte & Suporte Comunitário & Suporte Comunitário & Base de Suporte \\
-        \hline
-        Acesso ao GitHub Copilot & Não Incluído (Subscrição Paga) & Incluído (Geralmente Copilot Pro) & Produtividade e Aceleração por IA \\
-        \hline
-    \end{tabularx}
-    \caption{GitHub Free (Pessoal) vs. GitHub Student Developer Pack (Pro)}
-    \label{tab:core_comparison}
-\end{table}
-\par
-\newpage
-\section{Obtendo o GitHub Student Developer Pack}
+
+\section{Autenticação em dois fatores (2FA)}
+
+O GitHub exige a autenticação em dois fatores de quem contribui com código na
+plataforma. Quando a exigência chega à sua conta, você recebe um aviso e tem
+45 dias para ativar; depois disso, há mais 7 dias de carência antes de o
+acesso ser bloqueado \cite{github_2fa}. Como todo participante desta
+capacitação vai publicar código, vale ativar logo no primeiro dia.
+
 \begin{enumerate}
-  \item Vá até as configurações da sua conta no GitHub.
-  \item Na seção "Emails", adicione seu e-mail acadêmico - Figura \ref{fig:adding_academic_email}, p.\pageref{fig:adding_academic_email}.
+  \item Clique na sua foto (canto superior direito) \(\rightarrow\)
+        \menu{Settings} \(\rightarrow\) \menu{Password and authentication}.
+  \item Em \menu{Two-factor authentication}, clique em
+        \menu{Enable two-factor authentication}.
+  \item Leia o QR code com um aplicativo autenticador no celular e digite o
+        código de seis dígitos que ele mostrar.
+  \item \textbf{Baixe e guarde os códigos de recuperação}. Eles são a única
+        forma de entrar na conta se você perder o celular.
+\end{enumerate}
+
+\begin{dica}[Método principal e reserva]
+O GitHub recomenda um \textbf{aplicativo autenticador} (TOTP) como método
+principal e uma \emph{passkey} ou chave de segurança como reserva. Passkeys
+ainda não são aceitas como método principal.
+\end{dica}
+
+\section{Benefícios para estudantes}
+
+\subsection{O que o GitHub Education oferece}
+
+Estudantes verificados pelo GitHub Education recebem, sem custo e enquanto
+forem estudantes:
+
+\begin{itemize}
+  \item o plano \textbf{GitHub Pro} na conta pessoal;
+  \item o \textbf{Copilot Student}, um plano do GitHub Copilot próprio para
+        estudantes, ativado em um passo separado \cite{github_copilot_student};
+  \item o \textbf{Student Developer Pack}, com ofertas de ferramentas de
+        empresas parceiras.
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Diferenças entre o GitHub Free e o GitHub Pro (conta pessoal)}
+  \label{tab:free_pro}
+  \begin{tabularx}{\textwidth}{@{}X c c@{}}
+    \toprule
+    \textbf{Recurso} & \textbf{GitHub Free} & \textbf{GitHub Pro} \\
+    \midrule
+    Repositórios públicos e privados & ilimitados & ilimitados \\
+    Minutos de GitHub Actions por mês\textsuperscript{a} & 2.000 & 3.000 \\
+    Armazenamento do GitHub Packages & 500 MB & 2 GB \\
+    Codespaces: horas de núcleo por mês & 120 & 180 \\
+    Codespaces: armazenamento por mês & 15 GB & 20 GB \\
+    Git LFS: armazenamento e banda por mês & 10 GiB & 10 GiB \\
+    GitHub Pages em repositório privado & \nok & \ok \\
+    Revisores obrigatórios em repositório privado & \nok & \ok \\
+    Suporte & comunidade & e-mail \\
+    \bottomrule
+  \end{tabularx}
+  \par\smallskip
+  {\footnotesize \textsuperscript{a} Os minutos só são contados em
+  repositórios privados: em repositórios públicos, o GitHub Actions é gratuito.}
+\end{table}
+
+\begin{dica}[Copilot também existe no plano gratuito]
+Qualquer conta pode usar o \textbf{Copilot Free}, com limites mensais (por
+exemplo, 2.000 sugestões de código por mês). O Copilot Student libera mais
+recursos para quem é estudante verificado \cite{github_copilot_plans}.
+\end{dica}
+
+\subsection{Quem pode pedir}
+
+Segundo a documentação oficial \cite{github_education_apply}, é preciso:
+
+\begin{itemize}
+  \item estar matriculado em um curso que confere diploma (escola, faculdade,
+        universidade);
+  \item ter pelo menos 13 anos;
+  \item ter uma conta pessoal no GitHub;
+  \item enviar um comprovante de matrícula atual: foto da carteira de
+        estudante com a data de validade, grade de horários, histórico ou
+        declaração de matrícula.
+\end{itemize}
+
+\subsection{Passo a passo}
+
+\begin{enumerate}
+  \item \textbf{Cadastre o e-mail acadêmico.} Em \menu{Settings}
+        \(\rightarrow\) \menu{Emails}, adicione o e-mail da instituição
+        (Figura~\ref{fig:adding_academic_email}) e confirme pelo link que
+        chegar na caixa de entrada.
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{./assets/images/03_adding_academic_email.png}
-    \caption{Adicionar e verificar e-mail acadêmico no GitHub}
+    \caption{Adicionando o e-mail acadêmico}
     \label{fig:adding_academic_email}
   \end{figure}
-  \item Clique em "Add" \; para adicionar o e-mail.
-  \item Verifique o e-mail clicando no link enviado para sua caixa de entrada.
-  \item Após verificar o e-mail, você pode se inscrever no GitHub Student Developer Pack.
-  \item Acesse o site do GitHub Student Developer Pack: \url{https://education.github.com/pack} - Figura \ref{fig:github_student}, p.\pageref{fig:github_student}.
+  \item \textbf{Abra os benefícios de educação.} Acesse
+        \url{https://github.com/settings/education/benefits} e, em
+        \menu{GitHub Education}, clique em \menu{Start an application}
+        (Figura~\ref{fig:github_student_developer_pack}). A página pública do
+        pack (Figura~\ref{fig:github_student}) leva ao mesmo formulário.
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{./assets/images/04_gsdp_page.png}
-    \caption{Página do GitHub Student Developer Pack}
+    \caption{Página do Student Developer Pack (\texttt{education.github.com/pack})}
     \label{fig:github_student}
   \end{figure}
-  \item Clique em "Sign up for Student Developer Pack".
-  \item Isso redirecionará para fazer login na sua conta do GitHub, caso não esteja logado - Figura \ref{fig:github_student_developer_pack}, p.\pageref{fig:github_student_developer_pack}.
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{./assets/images/05_application_page.png}
-    \caption{Página do GitHub Student Developer Pack}
+    \caption{\menu{Education benefits} nas configurações, com o botão \menu{Start an application}}
     \label{fig:github_student_developer_pack}
-  \end{figure} 
-  \item Preencha os campos solicitados, incluindo seu e-mail acadêmico - Figura \ref{fig:application_start}, p.\pageref{fig:application_start}.
+  \end{figure}
   \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{./assets/images/06_start_application.png}
-    \caption{Iniciando a aplicação no GitHub Student Developer Pack}
+    \caption{Formulário da candidatura}
     \label{fig:application_start}
   \end{figure}
-  \item Anexe um comprovante de matrícula ou uma carta da instituição de ensino, se solicitado. \textbf{(Importante: Use um documento oficial da instituição, por experiência própria, use a carteirinha de estudante que possui foto, para mim o processo foi mais rápido ao usar.)}
-  \item Envie a solicitação e aguarde a aprovação, que pode levar alguns dias.
+  \item \textbf{Preencha e envie.} Escolha \menu{Student}, informe a
+        instituição e o e-mail acadêmico (Figura~\ref{fig:application_start}),
+        anexe o comprovante
+        e clique em \menu{Submit application}. A análise pode levar alguns
+        dias.
+  \item \textbf{Ative o Copilot Student depois da aprovação.} A aprovação e a
+        ativação do Copilot são passos separados
+        \cite{github_copilot_student}. Volte a
+        \url{https://github.com/settings/education/benefits} e siga as
+        instruções de ativação. Se só aparecerem planos pagos, espere alguns
+        dias: o benefício pode demorar para ser aplicado.
 \end{enumerate}
-\par
+
+\begin{dica}[Experiência do autor]
+A foto da carteira de estudante, com nome, foto e data de validade visíveis,
+costuma ser analisada mais rápido que outros documentos.
+\end{dica}
+
+\begin{aviso}[As telas mudam]
+As capturas deste capítulo são de 2025. O GitHub reorganiza as telas com
+frequência; se algo estiver diferente, procure pelos nomes dos botões citados
+no texto.
+\end{aviso}

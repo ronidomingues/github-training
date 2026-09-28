@@ -1,4 +1,7 @@
-\chapter{Commits, Merges e Pull Requests}
+% ======================================================================
+\chapter{Commits, merges e Pull Requests}
+\label{cap:commits}
+% ======================================================================
 
 \section{Introdução}
 Commits, merges e pull requests são elementos centrais no fluxo de trabalho com Git e plataformas como GitHub.  
@@ -15,58 +18,58 @@ Um commit registra o estado do diretório de trabalho (os arquivos staged) em um
   \item Mensagens claras: use assunto imperativo curto (\(\sim\)50 caracteres) + linha em branco + corpo explicativo se necessário (72 caracteres por linha).  
   \item Inclua referência a issues quando relevante (ex.: ``Closes \#42'').  
   \item Evite commitar arquivos gerados (binários, dependências) — use \texttt{.gitignore}.  
-  \item Assine commits quando necessário: \texttt{git commit -S -m "..."} (GPG).
+  \item Assine os commits (capítulo~\ref{cap:assinatura}).
 \end{itemize}
 
 \subsection{Fazendo commits — passo a passo}
 \begin{enumerate}
   \item Verificar o estado dos arquivos:
-  \begin{verbatim}
+  \begin{bashcode}
   git status
-  \end{verbatim}
+  \end{bashcode}
   \item Ver as mudanças não staged:
-  \begin{verbatim}
+  \begin{bashcode}
   git diff       # diferenças não adicionadas ao stage
   git diff --staged  # diferenças preparadas para commit
-  \end{verbatim}
+  \end{bashcode}
   \item Adicionar alterações ao stage (todo arquivo ou interativo):
-  \begin{verbatim}
+  \begin{bashcode}
   git add caminho/arquivo.txt  # adiciona arquivo específico
   git add .                    # adiciona tudo (cuidado)
   git add -p                   # adiciona parcialmente (patch)
-  \end{verbatim}
+  \end{bashcode}
   \item Criar o commit com boa mensagem:
-  \begin{verbatim}
+  \begin{bashcode}
   git commit -m "Assunto curto em imperativo"
   # ou para mensagem longa (editor):
   git commit
-  \end{verbatim}
+  \end{bashcode}
   Exemplo de mensagem:
-  \begin{verbatim}
+  \begin{bashcode}
   Corrige cálculo de juros
 
   Ajusta a fórmula de cálculo para considerar juros compostos
   quando o período é maior que 12 meses. Testes unitários
   adicionados para cobrir casos de fronteira.
-  \end{verbatim}
+  \end{bashcode}
   \item Ver histórico resumido:
-  \begin{verbatim}
+  \begin{bashcode}
   git log --oneline --graph --decorate --all
-  \end{verbatim}
+  \end{bashcode}
 \end{enumerate}
 
 \subsection{Editar o último commit / corrigir mensagens}
-\begin{verbatim}
+\begin{bashcode}
 # alterar o conteúdo do último commit (já staged)
 git commit --amend
 
 # alterar apenas a mensagem do último commit
 git commit --amend -m "Nova mensagem"
-\end{verbatim}
+\end{bashcode}
 \textbf{Atenção:} se o commit já foi enviado ao remoto, evite \texttt{--amend} sem combinar com a equipe — ele reescreve o histórico e exigirá push forçado.
 
 \subsection{Desfazer / alterar staging}
-\begin{verbatim}
+\begin{bashcode}
 git restore --staged arquivo.txt   # remove do stage, mantém
                                    # alteração no working tree
 
@@ -82,9 +85,11 @@ git reset --mixed HEAD~1           # desfaz último commit, mantendo
 
 git reset --hard HEAD~1            # desfaz último commit e 
                                    # descarta mudanças (CUIDADO)
-\end{verbatim}
+\end{bashcode}
 
-\input{./pages/padroes_de_commit}
+\begin{dica}[Como escrever a mensagem]
+O capítulo~\ref{cap:padroes} mostra um padrão para as mensagens de commit, o \emph{Conventional Commits}.
+\end{dica}
 
 \section{Merges}
 
@@ -98,91 +103,91 @@ git reset --hard HEAD~1            # desfaz último commit e
 \subsection{Merge local com merge commit (passo a passo)}
 \begin{enumerate}
   \item Atualize a branch principal:
-  \begin{verbatim}
-  git checkout main
+  \begin{bashcode}
+  git switch main
   git pull origin main
-  \end{verbatim}
+  \end{bashcode}
   \item Mudar para a branch de feature (se necessário):
-  \begin{verbatim}
-  git checkout feature/minha-feature
+  \begin{bashcode}
+  git switch feature/minha-feature
   git pull origin feature/minha-feature
-  \end{verbatim}
+  \end{bashcode}
   \item Voltar para a branch de destino e fazer merge:
-  \begin{verbatim}
-  git checkout main
+  \begin{bashcode}
+  git switch main
   git merge --no-ff feature/minha-feature
   # --no-ff força um commit de merge,
   # preservando histórico da branch
-  \end{verbatim}
+  \end{bashcode}
   \item Caso não haja conflitos, o Git criará o commit de merge automaticamente. Em caso de conflitos, siga a seção "Resolver conflitos" abaixo.
   \item Envie as mudanças para o remoto:
-  \begin{verbatim}
+  \begin{bashcode}
   git push origin main
-  \end{verbatim}
+  \end{bashcode}
 \end{enumerate}
 
 \subsection{Rebase (passo a passo) — para um histórico linear}
 \begin{enumerate}
   \item Atualize a base:
-  \begin{verbatim}
-  git checkout main
+  \begin{bashcode}
+  git switch main
   git pull origin main
-  \end{verbatim}
+  \end{bashcode}
   \item Rebase da feature sobre a main:
-  \begin{verbatim}
-  git checkout feature/minha-feature
+  \begin{bashcode}
+  git switch feature/minha-feature
   git rebase main
-  \end{verbatim}
+  \end{bashcode}
   \item Resolva conflitos (se aparecerem), use \texttt{git rebase --continue} e, ao final:
-  \begin{verbatim}
+  \begin{bashcode}
   # force push (com cuidado) após reescrever histórico
   git push --force-with-lease origin feature/minha-feature
-  \end{verbatim}
+  \end{bashcode}
   \item \textbf{Observação:} reescrever histórico (rebase + push forçado) requer coordenação com outros colaboradores.
 \end{enumerate}
 
 \subsection{Resolver conflitos — passo a passo}
 \begin{enumerate}
   \item Ao encontrar conflito durante merge/rebase, o Git mostra arquivos conflitantes:
-  \begin{verbatim}
+  \begin{bashcode}
   CONFLICT (content): Merge conflict in caminho/arquivo.txt
-  \end{verbatim}
+  \end{bashcode}
   \item Abra o arquivo e localize os marcadores:
-  \begin{verbatim}
+  \begin{bashcode}
   <<<<<<< HEAD
   conteúdo na branch atual (main)
   =======
   conteúdo vindo da branch feature/minha-feature
   >>>>>>> feature/minha-feature
-  \end{verbatim}
+  \end{bashcode}
   \item Edite o arquivo para a versão desejada (manter, combinar ou reescrever o trecho).
   \item Marque o conflito como resolvido:
-  \begin{verbatim}
+  \begin{bashcode}
   git add caminho/arquivo.txt
   # se for rebase:
   git rebase --continue
   # se for merge:
   git commit   # caso o Git não tenha criado o commit automaticamente
-  \end{verbatim}
+  \end{bashcode}
   \item Se quiser abortar a operação:
-  \begin{verbatim}
+  \begin{bashcode}
   git merge --abort    # durante um merge
   git rebase --abort   # durante um rebase
-  \end{verbatim}
+  \end{bashcode}
 \end{enumerate}
 
 \subsection{Squash e reescrita de commits (passo a passo)}
 \begin{enumerate}
-  \item Interative rebase para combinar commits locais:
-  \begin{verbatim}
-  git checkout feature/minha-feature
+  \item Rebase interativo para combinar commits locais:
+  \begin{bashcode}
+  git switch feature/minha-feature
   git rebase -i main
-  \end{verbatim}
+  \end{bashcode}
   \item No editor que abre, marque \texttt{squash} (ou \texttt{s}) nos commits que deseja unir ao commit anterior. Salve e feche.
   \item Após o rebase, force push com segurança:
-  \begin{verbatim}
+  \begin{bashcode}
   git push --force-with-lease origin feature/minha-feature
-  \end{verbatim}
+  \end{bashcode}
   \item Use \texttt{--force-with-lease} em vez de \texttt{--force} quando possível — ele evita sobrescrever pushes alheios.
 \end{enumerate}
 
@@ -194,13 +199,13 @@ Um PR é uma solicitação para integrar as mudanças de uma branch em outra (no
 \subsection{Fluxo básico — criando um PR (via web)}
 \begin{enumerate}
   \item Crie uma branch local para a sua feature:
-  \begin{verbatim}
-  git checkout -b feature/minha-feature
-  \end{verbatim}
+  \begin{bashcode}
+  git switch -c feature/minha-feature
+  \end{bashcode}
   \item Faça commits locais e envie a branch para o remoto:
-  \begin{verbatim}
+  \begin{bashcode}
   git push -u origin feature/minha-feature
-  \end{verbatim}
+  \end{bashcode}
   \item No repositório do GitHub, acesse \texttt{Pull requests} \(\rightarrow\) \texttt{New pull request}.
   \item Selecione a \textbf{branch de origem} (feature/minha-feature) e a \textbf{branch de destino} (ex.: main).
   \item Preencha o título e a descrição: explique o \textbf{porquê} e o \textbf{o que} foi alterado. Use referências a issues (ex.: ``Closes \#123'').
@@ -211,7 +216,7 @@ Um PR é uma solicitação para integrar as mudanças de uma branch em outra (no
 \end{enumerate}
 
 \subsection{Criar e gerenciar PRs via GitHub CLI (passo a passo)}
-\begin{verbatim}
+\begin{bashcode}
 # autentique (uma vez)
 gh auth login
 
@@ -229,7 +234,7 @@ gh pr merge <numero-ou-url> --squash --delete-branch
 # ou
 gh pr merge <numero> --merge      # cria commit de merge
 gh pr merge <numero> --rebase     # rebase and merge
-\end{verbatim}
+\end{bashcode}
 
 \subsection{Checklist para revisão de Pull Request}
 \begin{itemize}
@@ -242,9 +247,9 @@ gh pr merge <numero> --rebase     # rebase and merge
 \end{itemize}
 
 \subsection{Depois do merge — limpeza e sincronização}
-\begin{verbatim}
+\begin{bashcode}
 # atualizar a branch principal local
-git checkout main
+git switch main
 git pull origin main
 
 # remover branch remota (após merge)
@@ -255,11 +260,11 @@ git branch -d feature/minha-feature
 
 # caso a branch não possa ser deletada por não estar totalmente mesclada:
 git branch -D feature/minha-feature
-\end{verbatim}
+\end{bashcode}
 Também é útil rodar:
-\begin{verbatim}
+\begin{bashcode}
 git fetch --prune
-\end{verbatim}
+\end{bashcode}
 para remover referências remotas deletadas.
 
 \section{Boas práticas e recomendações finais}
@@ -272,7 +277,7 @@ para remover referências remotas deletadas.
 \end{itemize}
 
 \section{Exemplos rápidos de comandos úteis}
-\begin{verbatim}
+\begin{bashcode}
 # ver status e diferenças
 git status
 git diff
@@ -293,6 +298,6 @@ git reset --hard HEAD
 
 # forçar push com segurança
 git push --force-with-lease origin minha-branch
-\end{verbatim}
+\end{bashcode}
 
 % Fim do capítulo

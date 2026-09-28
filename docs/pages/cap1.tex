@@ -1,10 +1,105 @@
-% ----------------------------------------------------------------------------------------------------------------------
-% Início dos capítulos do trabalho;
-% ----------------------------------------------------------------------------------------------------------------------
+% ======================================================================
 \chapter{Introdução}
+\label{cap:introducao}
+% ======================================================================
 
-O GitHub consolidou-se como uma das principais plataformas de desenvolvimento colaborativo, sendo amplamente adotado por equipes e desenvolvedores individuais para o controle de versão, a gestão de projetos e a integração contínua. No entanto, o uso eficiente de suas ferramentas exige não apenas familiaridade com conceitos básicos, mas também o domínio de boas práticas e fluxos de trabalho modernos.
+O GitHub é hoje a principal plataforma de desenvolvimento colaborativo. Ele
+guarda o código, registra quem mudou o quê, organiza a revisão entre colegas e
+ainda publica sites e roda automações. Tudo isso em volta de uma ferramenta que
+vem antes dele: o \textbf{Git}.
 
-Esta capacitação foi elaborada com o objetivo de oferecer um guia prático e acessível para o uso do GitHub e de suas tecnologias associadas, como Git, GitHub CLI, Git LFS, GitHub Pages e GitHub Actions. O material abrange desde a configuração inicial do ambiente até a execução de operações avançadas, como a assinatura de commits com GPG e a automação de fluxos de trabalho.
+Este guia acompanha a capacitação de Git e GitHub da liga acadêmica. A
+apresentação dura duas horas; aqui está tudo o que foi dito com mais calma, os
+passos completos para Windows, Linux e macOS, e os exercícios para praticar
+depois.
 
-Além disso, são apresentados exercícios práticos que simulam situações reais de desenvolvimento, permitindo que os participantes vivenciem todo o ciclo de colaboração em projetos versionados. Com isso, espera-se que, ao final do curso, os participantes estejam aptos a contribuir de forma segura, organizada e profissional em repositórios locais e remotos, seja em projetos pessoais ou corporativos.
+\section{Objetivos de aprendizagem}
+
+Ao final, o participante é capaz de:
+
+\begin{enumerate}
+  \item criar e proteger a conta no GitHub, com autenticação em dois fatores, e
+        pedir os benefícios de estudante;
+  \item instalar e configurar o Git e o GitHub CLI no próprio sistema;
+  \item registrar alterações com commits bem escritos e trabalhar com branches;
+  \item integrar trabalho com merge e resolver um conflito;
+  \item contribuir com um projeto de outra pessoa por fork e Pull Request;
+  \item publicar um site com o GitHub Pages e automatizar uma tarefa com o
+        GitHub Actions;
+  \item versionar arquivos grandes com o Git LFS e assinar commits.
+\end{enumerate}
+
+\section{O roteiro das duas horas}
+
+\begin{table}[H]
+  \centering
+  \caption{Roteiro de tempo da capacitação}
+  \label{tab:roteiro}
+  \begin{tabularx}{\textwidth}{@{}c X c c@{}}
+    \toprule
+    \textbf{Bloco} & \textbf{Conteúdo} & \textbf{Início} & \textbf{Duração} \\
+    \midrule
+    0 & Abertura, objetivos e combinados & 00:00 & 5 min \\
+    1 & A conta no GitHub, 2FA e benefícios de estudante & 00:05 & 15 min \\
+    2 & Instalação, configuração e autenticação & 00:20 & 20 min \\
+    3 & Git no dia a dia: commits, branches, merge e conflito & 00:40 & 20 min \\
+    — & \textit{Pausa} & 01:00 & 5 min \\
+    4 & Colaboração: fork, Pull Request e padrões de commit & 01:05 & 20 min \\
+    5 & GitHub Pages e GitHub Actions & 01:25 & 15 min \\
+    6 & Git LFS e assinatura de commits & 01:40 & 15 min \\
+    7 & Encerramento e próximos passos & 01:55 & 5 min \\
+    \midrule
+      & \textbf{Total} & & \textbf{120 min} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{Como ler este guia}
+
+Os comandos aparecem em blocos como este. Linhas que começam com \texttt{\#}
+são comentários e não precisam ser digitadas:
+
+\begin{bashcode}
+# confere a versão do Git instalada
+git --version
+\end{bashcode}
+
+Ao longo do texto, três tipos de caixa chamam a atenção:
+
+\begin{conceito}
+Uma definição importante, para guardar.
+\end{conceito}
+
+\begin{dica}
+Um atalho ou uma boa prática.
+\end{dica}
+
+\begin{aviso}
+Um erro comum, ou um cuidado que evita dor de cabeça.
+\end{aviso}
+
+Quando um comando traz algo entre \texttt{<sinais>}, como
+\texttt{<seu-usuario>}, troque tudo, inclusive os sinais, pelo valor real.
+
+\begin{dica}[Qual terminal usar]
+No \textbf{Windows}, use o \textbf{Git Bash}, que vem com o Git (capítulo
+\ref{cap:ambiente}). Os comandos deste guia, como \texttt{ls}, \texttt{touch}
+e \texttt{mkdir -p}, são do Bash e não funcionam no Prompt de Comando. No
+\textbf{Linux} e no \textbf{macOS}, use o Terminal do sistema. A única exceção
+é a instalação pelo \texttt{winget}, feita no PowerShell.
+\end{dica}
+
+\section{Pré-requisitos}
+
+\begin{itemize}
+  \item Um computador com Windows 10 (versão 1809 ou mais nova), Windows 11,
+        Linux ou macOS, com permissão para instalar programas.
+  \item Um endereço de e-mail. Para os benefícios de estudante, é melhor ter o
+        e-mail acadêmico.
+  \item Um celular com um aplicativo autenticador (Google Authenticator,
+        Microsoft Authenticator ou similar), para a autenticação em dois
+        fatores.
+\end{itemize}
+
+Não é preciso saber programar. Os exercícios usam arquivos prontos, que estão
+na pasta \arq{materials/} do repositório.

@@ -1,82 +1,194 @@
-\chapter{GitHub Pages e GitHub Actions}
+% ======================================================================
+\chapter{Padrões de commit}
+\label{cap:padroes}
 
-\section{O que é GitHub Pages?}
-GitHub Pages é uma ferramenta gratuita oferecida pelo GitHub para hospedagem de sites estáticos diretamente a partir de um repositório. Essa funcionalidade permite que desenvolvedores publiquem páginas web com tecnologias como \textbf{HTML}, \textbf{CSS} e \textbf{JavaScript}, sem a necessidade de servidores adicionais ou configuração complexa.
+No capítulo~\ref{cap:commits} vimos como fazer commits. Este capítulo trata de \textbf{como escrever essa mensagem} de um jeito que a equipe inteira (e as ferramentas) consigam ler.
 
-Entre as principais características do GitHub Pages, podemos destacar:
+\section{Por que padronizar}
+
+Compare dois históricos do mesmo projeto:
+
+\begin{saida}
+a41aded ajustes
+c2524a8 arrumei
+afe16bb agora vai
+4203776 mudanças do joão
+\end{saida}
+\begin{saida}
+a41aded fix(login): corrige senha vazia
+c2524a8 feat(relatorio): exporta em PDF
+afe16bb docs: explica a instalação
+4203776 test(login): cobre senha vazia
+\end{saida}
+
+No segundo, dá para saber \textbf{o tipo} da mudança, \textbf{onde} ela aconteceu e \textbf{o que} foi feito, sem abrir um arquivo sequer. Um padrão de commit também permite automatizar tarefas: gerar notas de versão, decidir o próximo número de versão e barrar mensagens fora do combinado.
+
+\begin{conceito}[A regra mais importante]
+O melhor padrão é \textbf{o que a equipe combinou e segue}. Os padrões deste capítulo são os mais usados, mas consistência vale mais que qualquer escolha isolada.
+\end{conceito}
+
+\section{Conventional Commits}
+
+O padrão mais difundido é o \textbf{Conventional Commits} 1.0.0 (\url{https://www.conventionalcommits.org/pt-br/v1.0.0/}). A estrutura é:
+
+\begin{bashcode}
+<tipo>[escopo opcional]: <descrição>
+
+[corpo opcional]
+
+[rodapé(s) opcional(is)]
+\end{bashcode}
+
+As regras principais da especificação:
+
 \begin{itemize}
-    \item \textbf{Hospedagem gratuita:} todo repositório público pode gerar uma página web sem custos.
-    \item \textbf{Suporte a domínios personalizados:} é possível usar seu próprio domínio, além do subdomínio padrão do GitHub (\texttt{username.github.io}).
-    \item \textbf{Atualização automática:} sempre que você faz um \textit{push} no repositório, o site é atualizado automaticamente.
-    \item \textbf{Compatibilidade com geradores de site estático:} ferramentas como \textit{Jekyll}, \textit{Hugo} e \textit{Eleventy} podem ser integradas facilmente.
+  \item o \textbf{tipo} é obrigatório e vem primeiro, seguido de \textbf{dois-pontos e espaço};
+  \item o \textbf{escopo} é opcional: um substantivo entre parênteses que diz qual parte do sistema mudou, como \arq{fix(parser):};
+  \item a \textbf{descrição} vem logo depois de \arq{: } e resume a mudança;
+  \item o \textbf{corpo} é opcional e começa \textbf{uma linha em branco} depois da descrição, com quantos parágrafos forem necessários;
+  \item os \textbf{rodapés} são opcionais e vêm uma linha em branco depois do corpo, no formato \arq{Token: valor} (por exemplo, \arq{Refs: \#123} ou \arq{Reviewed-by: Maria});
+  \item uma \textbf{quebra de compatibilidade} (\emph{breaking change}) é indicada com \arq{!} antes dos dois-pontos, com um rodapé \arq{BREAKING CHANGE: <explicação>}, ou com os dois.
 \end{itemize}
 
-\textbf{Exemplo de uso:} um repositório com um arquivo \texttt{index.html} na branch \texttt{main} pode ser publicado acessando o GitHub Pages nas configurações do repositório, sem qualquer configuração adicional.
+\begin{bashcode}
+feat(api)!: exige autenticação em todos os endpoints
 
-\section{O que é GitHub Actions?}
-O GitHub Actions é uma plataforma de automação que permite criar fluxos de trabalho (\textit{workflows}) para automatizar tarefas de desenvolvimento. Ele funciona diretamente no GitHub, sem necessidade de servidores externos, e pode ser usado para:
+Antes, os endpoints de consulta eram públicos. Agora todo pedido
+precisa do cabeçalho Authorization com um token válido.
+
+BREAKING CHANGE: clientes sem token passam a receber 401.
+Refs: #42
+\end{bashcode}
+
+\subsection{Os tipos}
+
+A especificação só define dois tipos: \textbf{\arq{feat}} (novo recurso) e \textbf{\arq{fix}} (correção de bug). Os outros são convenção, herdada das regras do projeto Angular. A lista abaixo é a aceita pela configuração padrão do \emph{commitlint} (seção \ref{sec:commitlint}):
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\color{roxoescuro}}l X@{}}
+\toprule
+\textrm{\textbf{Tipo}} & \textbf{Quando usar} \\
+\midrule
+feat & um recurso novo para quem usa o sistema \\
+fix & a correção de um bug \\
+docs & só documentação (README, comentários, manuais) \\
+style & formatação que não muda o comportamento (espaços, ponto e vírgula, indentação) \\
+refactor & reorganização do código sem mudar o que ele faz nem corrigir bug \\
+perf & melhoria de desempenho \\
+test & criação ou ajuste de testes \\
+build & sistema de build ou dependências (npm, pip, Maven\ldots) \\
+ci & configuração de integração contínua (GitHub Actions) \\
+chore & tarefas de manutenção que não se encaixam nos outros tipos \\
+revert & desfaz um commit anterior \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{dica}[Tipos e versões]
+Com Conventional Commits, ferramentas conseguem calcular a próxima versão pelo \emph{Versionamento Semântico}: \arq{fix} sobe o número de correção (1.2.\textbf{3}), \arq{feat} sobe o número de recurso (1.\textbf{3}.0) e um \arq{BREAKING CHANGE} sobe o número principal (\textbf{2}.0.0).
+\end{dica}
+
+\begin{aviso}[Tipos fora da lista]
+Algumas referências populares em português acrescentam tipos como \arq{raw}, \arq{cleanup}, \arq{remove} e \arq{init}. Eles não fazem parte da especificação nem da configuração padrão do commitlint, que os rejeita. Só use se a equipe combinar e configurar isso.
+\end{aviso}
+
+\section{Boas práticas para a mensagem}
+
 \begin{itemize}
-    \item \textbf{Testes automatizados:} executar testes sempre que houver alterações no código.
-    \item \textbf{Compilação e \textit{build} de projetos:} gerar executáveis, bibliotecas ou pacotes para diferentes plataformas.
-    \item \textbf{Publicação automática:} enviar versões de aplicativos ou páginas web para ambientes de produção.
-    \item \textbf{Integração contínua (CI) e entrega contínua (CD):} garantir que o código enviado para o repositório esteja sempre funcional.
+  \item \textbf{Uma mudança por commit.} Se a descrição precisa de um \enquote{e}, provavelmente são dois commits. Commits pequenos são mais fáceis de revisar e de desfazer.
+  \item \textbf{Descrição curta.} O livro \emph{Pro Git} recomenda uma primeira linha de até uns 50 caracteres e o corpo quebrado em 72 colunas. A configuração padrão do commitlint aceita até 100 caracteres no cabeçalho.
+  \item \textbf{O corpo explica o porquê.} O \enquote{o quê} está no \comando{git diff}. O motivo da mudança só existe na mensagem.
+  \item \textbf{Um único modo verbal.} As convenções em inglês usam o imperativo (\enquote{add}, \enquote{fix}). Em português, equipes usam o imperativo (\enquote{corrige}), o presente (\enquote{corrige}) ou o gerúndio (\enquote{corrigindo}). A especificação não exige nenhum. Escolha um e mantenha.
+  \item \textbf{Idioma combinado.} A especificação também não fixa idioma. Misturar português e inglês no mesmo histórico atrapalha a busca.
 \end{itemize}
 
-\textbf{Estrutura de um workflow:}  
-Um workflow é definido por arquivos YAML dentro da pasta \texttt{.github/workflows/} do repositório e consiste basicamente em:
-\begin{itemize}
-    \item \texttt{name:} nome do workflow.
-    \item \texttt{on:} eventos que disparam o workflow, como \texttt{push}, \texttt{pull\_request}, etc.
-    \item \texttt{jobs:} conjunto de tarefas a serem executadas.
-    \item \texttt{steps:} etapas dentro de cada job, que podem incluir instalação de dependências, execução de scripts, testes, builds e deploy.
-\end{itemize}
+\section{Gitmoji: emojis nas mensagens}
 
-\section{Integração entre GitHub Pages e GitHub Actions}
-A integração entre GitHub Pages e GitHub Actions permite automatizar a publicação de sites sempre que o código for atualizado. Esse processo envolve:
+O \textbf{gitmoji} (\url{https://gitmoji.dev}) associa um emoji a cada tipo de mudança. No texto do commit, o emoji aparece como um código entre dois-pontos, o \emph{shortcode}. Alguns dos mais usados, com a descrição oficial traduzida:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily\color{roxoescuro}}l X >{\ttfamily\color{roxoescuro}}l X@{}}
+\toprule
+\textrm{\textbf{Código}} & \textbf{Significado} & \textrm{\textbf{Código}} & \textbf{Significado} \\
+\midrule
+:sparkles: & novo recurso & :bug: & corrige um bug \\
+:memo: & documentação & :art: & estrutura ou formato do código \\
+:zap: & desempenho & :recycle: & refatoração \\
+:fire: & remove código ou arquivos & :truck: & move ou renomeia arquivos \\
+:white\_check\_mark: & testes & :construction\_worker: & CI \\
+:wrench: & arquivos de configuração & :package: & arquivos compilados ou pacotes \\
+:lock: & segurança ou privacidade & :ambulance: & correção crítica urgente \\
+:pencil2: & corrige erro de digitação & :rewind: & reverte mudanças \\
+:tada: & começa um projeto & :bookmark: & versão ou tag \\
+:page\_facing\_up: & licença & :card\_file\_box: & mudanças de banco de dados \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+A lista completa tem 75 emojis e está em \url{https://gitmoji.dev}.
+
+\begin{aviso}[Três cuidados com emojis]
 \begin{enumerate}
-    \item Configuração do repositório para hospedar o site na branch \texttt{gh-pages} ou na pasta \texttt{/docs}.
-    \item Criação de um workflow no GitHub Actions, geralmente disparado pelo evento \texttt{push} na branch principal (\texttt{main}).
-    \item Etapas do workflow típicas:
-    \begin{itemize}
-        \item \textbf{Instalação de dependências:} por exemplo, instalar Node.js e pacotes necessários.
-        \item \textbf{Compilação do site:} gerar os arquivos finais (\texttt{HTML, CSS, JS}).
-        \item \textbf{Publicação:} enviar os arquivos para a branch ou pasta configurada para GitHub Pages.
-    \end{itemize}
-    \item Verificação: após o deploy, o site é atualizado automaticamente, podendo ser acessado pelo domínio configurado.
+  \item \textbf{O terminal não converte.} O GitHub mostra o emoji na página do commit, mas o \comando{git log} exibe o texto \arq{:sparkles:} como foi escrito.
+  \item \textbf{O mesmo emoji muda de sentido entre fontes.} Na lista oficial, \arq{:boom:} é quebra de compatibilidade, mas há tutoriais que o usam para \enquote{reverter}. Siga a lista oficial.
+  \item \textbf{Emoji antes do tipo quebra o padrão.} A especificação exige que a mensagem comece pelo tipo. Uma mensagem como \arq{:bug: fix: corrige o login} é rejeitada pelo commitlint na configuração padrão.
 \end{enumerate}
+\end{aviso}
 
-\textbf{Exemplo de arquivo de workflow simples (\texttt{deploy.yml}):}
-\begin{verbatim}
-name: Deploy GitHub Pages
+\section{Um padrão combinando os dois}
 
-on:
-  push:
-    branches:
-      - main
+Muitas equipes juntam gitmoji e Conventional Commits num padrão próprio. É o caso dos repositórios do autor deste guia, que usam:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm install
-      - name: Build site
-        run: npm run build
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-\end{verbatim}
+\begin{bashcode}
+<:emoji:> <tipo>(<escopo>): <Descrição no gerúndio>
 
-\textbf{Benefícios da integração:}
-\begin{itemize}
-    \item Atualização automática do site sem intervenção manual.
-    \item Garantia de que apenas código validado e testado seja publicado.
-    \item Possibilidade de incluir etapas adicionais, como otimização de imagens, minificação de CSS/JS e execução de testes automatizados antes do deploy.
-\end{itemize}
+:memo: docs(guia): Adicionando os exercícios de assinatura
+:bug: fix(login): Corrigindo o acesso com senha vazia
+:truck: chore(docs): Movendo o manual para a pasta materials
+\end{bashcode}
+
+Não há nada de errado nisso, desde que \textbf{seja uma decisão da equipe, esteja escrita} (no README ou num guia de contribuição) e \textbf{as ferramentas estejam configuradas para aceitá-la}. O ponto é a consistência.
+
+\section{Ferramentas}
+\label{sec:commitlint}
+
+\subsection*{commitlint: barrar mensagens fora do padrão}
+
+O \textbf{commitlint} (\url{https://commitlint.js.org}) confere cada mensagem antes de o commit ser gravado. Num projeto com Node.js:
+
+\begin{bashcode}
+npm install -D @commitlint/cli @commitlint/config-conventional
+echo "export default { extends: ['@commitlint/config-conventional'] };" > commitlint.config.js
+
+# testar uma mensagem sem precisar fazer commit
+echo "feat: adiciona exportação em PDF" | npx commitlint
+\end{bashcode}
+
+Para rodar automaticamente em todo \comando{git commit}, o guia oficial usa o \emph{husky}:
+
+\begin{bashcode}
+npm install --save-dev husky
+npx husky init
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+\end{bashcode}
+
+Depois disso, \comando{git commit -m "foo: teste"} é recusado, porque \arq{foo} não é um tipo válido.
+
+\begin{aviso}[A configuração padrão é rígida]
+Além de exigir o tipo no início, a configuração padrão rejeita descrições que começam com letra maiúscula. Um padrão como o da seção anterior precisa de regras próprias no \arq{commitlint.config.js}.
+\end{aviso}
+
+\subsection*{gitmoji-cli: escolher o emoji num menu}
+
+\begin{bashcode}
+npm i -g gitmoji-cli
+gitmoji -c        # monta o commit de forma interativa
+gitmoji -l        # lista os emojis
+\end{bashcode}
+
+\subsection*{Sem ferramenta nenhuma}
+
+Nada disso é obrigatório. Um arquivo \arq{CONTRIBUTING.md} com o padrão e três exemplos já resolve boa parte do problema, e a revisão do Pull Request (capítulo~\ref{cap:commits}) é um bom momento para lembrar o combinado.

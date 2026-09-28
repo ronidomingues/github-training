@@ -1,240 +1,271 @@
-\chapter{Git e GitHub-CLI}
-\par
-\section{O que é o Git?}
-O Git é um software open source, gratuito e multiplataforma voltado para o versionamento de código. Ele oferece um sistema de controle de versão distribuído, amplamente utilizado no desenvolvimento de software, que permite que múltiplos desenvolvedores trabalhem simultaneamente em um mesmo projeto. O Git rastreia as alterações realizadas nos arquivos, possibilitando reverter modificações, comparar versões e gerenciar ramificações (branches) de forma eficiente e segura.
-\subsection{Instalação do Git}
-\begin{enumerate}
-  \item Abra o Prompt de Comando ou PowerShell.
-  \item Digite o comando:
-  \begin{verbatim}
-    winget search git
-  \end{verbatim}
-  \item Na primeira vez que algum comando do Winget for executado, ele pedirá o aceite dos termos de uso. Ao aceitar, digitando \texttt{Y} ou \texttt{y}.
-  \item Nesse comando \texttt{winget search git}, será buscado na base do winget todas as ocorrências em que o termo \texttt{git} aparece e será retornado uma tabela com os resultados associando o nome do programa, seu \textcolor{cyan}{id} para a instalação e algumas outras informações.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/08_winget_search.png}
-    \caption{Buscando o Git no Winget.}
-    \label{fig:winget_search}
-  \end{figure} 
-  \item Assim que localizar o software que deseja, copie ou memorize seu \textcolor{cyan}{id}, em nosso caso o \textcolor{cyan}{id} = \textcolor{cyan}{Git.Git}, e digite o comando:
-  \begin{verbatim}
-    winget install Git.Git
-  \end{verbatim}
-  e pressione Enter.
-  \item Siga as instruções na tela para concluir a instalação.
-  \item Aguarde a conclusão da instalação.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/09_install_git.png}
-    \caption{Instalação do Git.}
-    \label{fig:install_git}
-  \end{figure}
-  \item Verifique a instalação digitando, em alguns casos o Windows exige que o terminal seja reiniciado para que as variáveis de ambiente adicionadas com a instalação sejam carregadas corretamente:
-  \begin{verbatim}
-    git --version
-  \end{verbatim}
-  O comando deve retornar a versão do Git instalada.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/10_git_version.png}
-    \caption{Verificando se o Git está instalado.}
-    \label{fig:git_version}
-  \end{figure}
-\end{enumerate}
-\par
-\section{O que é o GitHub-CLI?}
-O GitHub-CLI (Command Line Interface) é uma ferramenta de linha de comando desenvolvida pela GitHub, Inc., que permite interagir com os repositórios e recursos do GitHub diretamente pelo terminal, sem a necessidade de acessar a interface web.
+% ======================================================================
+\chapter{Git e GitHub CLI: configuração e login}
+\label{cap:git}
+% ======================================================================
 
-Com o GitHub-CLI, é possível executar operações comuns como clonar repositórios, criar issues, abrir e revisar pull requests, gerenciar branches, autenticar usuários, visualizar status de workflows e automatizar fluxos de trabalho, integrando-se perfeitamente com o Git e com scripts de automação.
+\section{O que é o Git}
 
-Essa ferramenta é especialmente útil para desenvolvedores que preferem trabalhar no terminal, proporcionando agilidade, automação e maior produtividade no gerenciamento de projetos hospedados no GitHub.
-\subsection{Instalação do GitHub-CLI}
-\begin{enumerate}
-  \item Abra o Prompt de Comando ou PowerShell.
-  \item Agora \textcolor{cyan}{id} = \textcolor{cyan}{GitHub.cli}, e digite o comando:
-  \begin{verbatim}
-    winget install GitHub.cli
-  \end{verbatim}
-  e pressione Enter.
-  \item Aguarde a conclusão da instalação.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/11_install_cli.png}
-    \caption{Instalando o GitHub-CLI.}
-    \label{fig:install_cli}
-  \end{figure}
-  \item Verifique a instalação digitando:
-  \begin{verbatim}
-    gh --version
-  \end{verbatim}
-    O comando deve retornar a versão do GitHub-CLI instalada.
-    \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/12_cli_version.png}
-    \caption{Verificando se o GitHub-CLI está instalado.}
-    \label{fig:cli_version}
-  \end{figure}
-\end{enumerate}
-\par
-\section{Configuração do Git e GitHub-CLI}
-Após a instalação do Git e do GitHub-CLI, é necessário realizar algumas configurações iniciais para garantir que suas informações estejam corretas ao fazer commits e interagir com o GitHub.
-\par
-\subsection{Autenticação}
-Existem duas formas seguras de autenticação para o Git, a primeira envolve a geração de um token de acesso pessoal (PAT - Personal Access Token) no GitHub, que é usado como senha ao fazer push ou pull de repositórios remotos. A segunda forma é a autenticação via SSH, que envolve a criação de um par de chaves SSH (pública e privada) e a adição da chave pública à sua conta do GitHub. A autenticação via SSH é geralmente mais segura e conveniente, pois elimina a necessidade de inserir o token ou senha repetidamente.
+\begin{conceito}[Git]
+O Git é um \textbf{sistema distribuído de controle de versão}, gratuito e de
+código aberto. Ele registra cada alteração num \textbf{commit}: uma fotografia
+do projeto com autor, data e uma mensagem explicando o porquê.
+\enquote{Distribuído} quer dizer que cada pessoa tem o histórico completo no
+próprio computador.
+\end{conceito}
 
-OBS.: \textbf{Desde agosto de 2021, o GitHub não aceita mais autenticação via senha para operações Git que envolvem repositórios remotos. Portanto, é obrigatório o uso de tokens de acesso pessoal (PAT) ou autenticação via SSH para essas operações.}
+Um arquivo passa por três lugares:
 
-A opção dois é usando o GitHub-CLI, que facilita o processo de autenticação. A seguir, estão os passos para configurar a autenticação usando o GitHub-CLI.
-\par
-\subsubsection{Autenticação com o GitHub-CLI}
-Para autenticar-se no GitHub-CLI, execute o comando:
-\begin{verbatim}
-  gh auth login
-\end{verbatim}
-Siga as instruções na tela para concluir o processo de autenticação.
+\begin{table}[H]
+  \centering
+  \caption{As três áreas do Git}
+  \label{tab:tres_areas}
+  \begin{tabularx}{\textwidth}{@{}l X l@{}}
+    \toprule
+    \textbf{Área} & \textbf{O que é} & \textbf{Como chega lá} \\
+    \midrule
+    Diretório de trabalho & os arquivos como você os vê e edita & editando \\
+    Área de preparação (\emph{staging}) & o que vai entrar no próximo commit & \comando{git add} \\
+    Repositório & o histórico de commits, na pasta oculta \arq{.git} & \comando{git commit} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\section{O que é o GitHub CLI}
+
+O GitHub CLI (\texttt{gh}) faz pelo terminal o que você faria no site: criar
+repositórios, abrir e revisar Pull Requests, acompanhar workflows. Ele também
+resolve a parte mais chata para iniciantes: o \textbf{login}.
+
+% ----------------------------------------------------------------------
+\section{Dizendo ao Git quem é você}
+% ----------------------------------------------------------------------
+
+Todo commit leva nome e e-mail. Configure uma vez por computador
+(Figura~\ref{fig:git_base_config}):
+
+\begin{bashcode}
+git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"
+\end{bashcode}
+
 \begin{figure}[H]
   \centering
-  \caption{Efetuando a autenticação com o GitHub-CLI - Passo 1.}
+  \includegraphics[width=0.9\textwidth]{./assets/images/14_git_base_config.png}
+  \caption{Configurando nome e e-mail}
+  \label{fig:git_base_config}
+\end{figure}
+
+\begin{dica}[E-mail cadastrado e privacidade]
+Use um e-mail cadastrado na sua conta do GitHub, para os commits aparecerem
+ligados ao seu perfil. Se não quiser expor o e-mail pessoal, marque
+\menu{Keep my email addresses private} em \menu{Settings} \(\rightarrow\)
+\menu{Emails} e use o endereço \texttt{...@users.noreply.github.com} que o
+GitHub mostra nessa mesma tela.
+\end{dica}
+
+Três ajustes que evitam surpresas:
+
+\begin{bashcode}
+# novos repositórios começam na branch main, como no GitHub
+git config --global init.defaultBranch main
+
+# git pull faz merge quando as branches divergem
+git config --global pull.rebase false
+
+# (opcional) VS Code como editor das mensagens de commit
+git config --global core.editor "code --wait"
+\end{bashcode}
+
+\begin{aviso}[Por que o pull.rebase false]
+Sem essa configuração, um \comando{git pull} com alterações dos dois lados
+termina em \texttt{fatal: Need to specify how to reconcile divergent
+branches}. O instalador do Git para Windows já define essa opção; no Linux e
+no macOS é preciso configurar.
+\end{aviso}
+
+Para conferir tudo: \comando{git config --global --list}.
+
+% ----------------------------------------------------------------------
+\section{Fazendo login no GitHub}
+% ----------------------------------------------------------------------
+
+Desde agosto de 2021, o GitHub não aceita a senha da conta em operações do Git
+pela linha de comando. É preciso um token ou uma chave SSH. O jeito mais
+simples de configurar isso é o GitHub CLI.
+
+\subsection{Pelo GitHub CLI (recomendado)}
+
+\begin{bashcode}
+gh auth login
+\end{bashcode}
+
+Responda às perguntas assim
+(Figuras~\ref{fig:gh_auth_login_0} a~\ref{fig:gh_auth_login_4}):
+
+\begin{table}[H]
+  \centering
+  \caption{Respostas do \texttt{gh auth login}}
+  \label{tab:gh_auth}
+  \begin{tabularx}{\textwidth}{@{}X l@{}}
+    \toprule
+    \textbf{Pergunta} & \textbf{Resposta} \\
+    \midrule
+    Where do you use GitHub? & \texttt{GitHub.com} \\
+    What is your preferred protocol for Git operations? & \texttt{HTTPS} \\
+    Authenticate Git with your GitHub credentials? & \texttt{Yes} \\
+    How would you like to authenticate GitHub CLI? & \texttt{Login with a web browser} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+O terminal mostra um código de uso único. Aperte \tecla{Enter} para abrir o
+navegador, entre na conta, digite o código e autorize.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{./assets/images/13_0_gh_auth_login.png}
+  \caption{\texttt{gh auth login}: escolhendo o GitHub.com}
   \label{fig:gh_auth_login_0}
-  \includegraphics[width=0.9\textwidth]{./assets/images/13_0_gh_auth_login.png}
-  \caption{Efetuando a autenticação com o GitHub-CLI - Passo 2.}
-  \label{fig:gh_auth_login_1}
-  \includegraphics[width=0.9\textwidth]{./assets/images/13_1_gh_auth_login.png}
-  \caption{Efetuando a autenticação com o GitHub-CLI - Passo 3.}
-  \label{fig:gh_auth_login_2}
-  \includegraphics[width=0.9\textwidth]{./assets/images/13_2_gh_auth_login.png}
 \end{figure}
 \begin{figure}[H]
   \centering
-  \caption{Efetuando a autenticação com o GitHub-CLI - Passo 4.}
-  \label{fig:gh_auth_login_3}
-  \includegraphics[width=0.9\textwidth]{./assets/images/13_3_gh_auth_login.png}
-  \caption{Efetuando a autenticação com o GitHub-CLI - Passo 5.}
-  \label{fig:gh_auth_login_4}
-  \includegraphics[width=0.9\textwidth]{./assets/images/13_4_gh_auth_login.png}
+  \includegraphics[width=0.85\textwidth]{./assets/images/13_1_gh_auth_login.png}
+  \caption{\texttt{gh auth login}: escolhendo o protocolo}
+  \label{fig:gh_auth_login_1}
 \end{figure}
-\par
-Após o passo 5 na Figura \ref{fig:gh_auth_login_4}, p.\pageref{fig:gh_auth_login_4}, será preciso copiar o código gerado abrir o navegador no link fornecido ou se precionar a tecla \texttt{Enter} abrirá o link automaticamente. Nessa tela será pedido que você se autentique e em seguida aparecerá o campo para digitar o código gerado e algumas permissões serão solicitadas.
-\subsection{Configuração de usuário Git}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{./assets/images/13_2_gh_auth_login.png}
+  \caption{\texttt{gh auth login}: autenticando o Git com as credenciais do GitHub}
+  \label{fig:gh_auth_login_2}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{./assets/images/13_3_gh_auth_login.png}
+  \caption{\texttt{gh auth login}: login pelo navegador}
+  \label{fig:gh_auth_login_3}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{./assets/images/13_4_gh_auth_login.png}
+  \caption{\texttt{gh auth login}: código de uso único}
+  \label{fig:gh_auth_login_4}
+\end{figure}
+
+\begin{conceito}[O que o \enquote{Yes} faz]
+Responder \texttt{Yes} em \enquote{Authenticate Git with your GitHub
+credentials?} faz o \texttt{gh} emprestar o login dele ao Git. É isso que faz
+o \comando{git push} funcionar sem pedir senha. Se você respondeu
+\texttt{No}, rode \comando{gh auth setup-git} para configurar depois
+\cite{gh_manual}.
+\end{conceito}
+
+Para conferir: \comando{gh auth status}.
+
+\subsection{Por chave SSH (alternativa)}
+
+Com SSH, o computador prova quem é usando um par de chaves: a
+\textbf{privada} fica só com você, e a \textbf{pública} é cadastrada no GitHub.
+
+\begin{bashcode}
+# cria o par de chaves (aceite o local padrão e escolha uma senha)
+ssh-keygen -t ed25519 -C "seu.email@exemplo.com"
+
+# cadastra a chave pública na sua conta
+gh ssh-key add ~/.ssh/id_ed25519.pub --title "Meu notebook"
+
+# testa a conexão
+ssh -T git@github.com
+\end{bashcode}
+
+Na primeira conexão, o SSH pergunta se confia no servidor: responda
+\texttt{yes}. A resposta esperada é:
+
+\begin{saida}
+Hi seu-usuario! You've successfully authenticated, but GitHub does not provide shell access.
+\end{saida}
+
+Com SSH, os endereços dos repositórios passam a ser
+\texttt{git@github.com:usuario/repositorio.git}, em vez de
+\texttt{https://github.com/...}.
+
+\subsection{Por token de acesso pessoal (para scripts)}
+
+Um \textbf{Personal Access Token} (PAT) é uma senha de uso restrito, com prazo
+de validade, que você gera no site. Para uso pessoal no terminal, o
+\texttt{gh auth login} já resolve. O PAT faz sentido para scripts e
+automações.
+
 \begin{enumerate}
-  \item Abra o Prompt de Comando ou PowerShell.
-  \item Verifique a instalação do Git digitando:
-  \begin{verbatim}
-    git --version
-  \end{verbatim}
-  O comando deve retornar a versão do Git instalada.
-  \item Configure seu nome de usuário com o comando:
-  \begin{verbatim}
-    git config --global user.name "Seu Nome"
-  \end{verbatim}
-  Substitua "Seu Nome" pelo nome que você deseja associar aos seus commits e pressione Enter.
-  \item Verifique se o nome foi configurado corretamente com o comando:
-  \begin{verbatim}
-    git config --global user.name
-  \end{verbatim}
-  Pressione Enter.
-  O comando deve retornar o nome que você configurou.
-  \item Agora, configure seu e-mail com o comando:
-  \begin{verbatim}
-    git config --global user.email "Seu E-mail"
-  \end{verbatim}
-  Substitua "Seu E-mail" pelo e-mail que você deseja associar aos seus commits e pressione Enter.
-  \item Verifique se o e-mail foi configurado corretamente com o comando:
-  \begin{verbatim}
-    git config --global user.email
-  \end{verbatim}
-  Pressione Enter.
-  O comando deve retornar o e-mail que você configurou.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/14_git_base_config.png}
-    \caption{Configurando o Git.}
-    \label{fig:git_base_config}
-  \end{figure}
+  \item Acesse \url{https://github.com/settings/personal-access-tokens/new}
+        (token \textbf{fine-grained}).
+  \item Dê um nome, uma validade e escolha \textbf{só os repositórios} e
+        \textbf{só as permissões} necessárias.
+  \item Gere e copie o valor. Ele não aparece de novo.
 \end{enumerate}
-\par
-\subsubsection{Autenticação usando PAT (Opcional)}
-O uso da autenticação com Personal Access Token (PAT) no GitHub oferece maior segurança em comparação à utilização de senhas tradicionais. Isso porque o token pode ser revogado a qualquer momento diretamente nas configurações da conta, além de possuir um prazo de validade configurável no momento da criação.
-Ademais, os PATs permitem definir escopos específicos de acesso, garantindo que o token tenha apenas as permissões necessárias para a operação desejada.
-Se você optar por usar um Token de Acesso Pessoal (PAT) para autenticação, siga os passos abaixo:
-\begin{enumerate}
-  \item Acesse o link \url{https://github.com/settings/tokens} na sua conta do GitHub.
-  \item Clique em "Generate new token (classic)".
-  \item Marque escopos como:
-  \begin{itemize}
-    \item repo (para acesso completo a repositórios privados e públicos)
-    \item  workflows (para gerenciar e visualizar GitHub Actions)
-  \end{itemize}
-  \item Clique em "Generate token" na parte inferior da página e copie o token gerado (ele não será mostrado novamente!).
-  \item Agora, ao fazer um git push, quando o Git solicitar senha e usuario:
-  \begin{itemize}
-    \item Use seu nome de usuário do GitHub como usuário.
-    \item Cole o token gerado como senha.
-  \end{itemize}
-  \item Você também pode salvar o token gerado no cache de credenciais do Git para evitar ter que digitá-lo toda vez que fizer push ou pull. Para isso, use o comando:
-  \begin{verbatim}
-    git config --global credential.helper store
-  \end{verbatim}
-  Com isso, na próxima vez que você digitar o token, ele será salvo no arquivo `~/.git-credentials` e usado automaticamente nas próximas operações.
-\end{enumerate}
-\par
-\subsection{Configuração de Editor Padrão (Opcional)}
-Você pode configurar o editor de texto padrão que será usado para escrever mensagens de commit. Por exemplo, para configurar o Visual Studio Code como editor padrão, use o comando:
-\begin{verbatim}
-  git config --global core.editor "code --wait"
-\end{verbatim}
-Substitua "code --wait" pelo comando do editor de sua preferência.
-\par
-\subsection{Configurar a branch padrão para 'main' (Opcional)}
-Para configurar a branch padrão para 'main', use o comando:
-\begin{verbatim}
-  git config --global init.defaultBranch main
-\end{verbatim}
-Isso garantirá que novos repositórios criados localmente usem 'main' como a branch padrão. Caso não queira definir esse padrão é possivel mudar a branch individualmente para cada repositório com o comando:
-\begin{verbatim}
-  git branch -M main
-\end{verbatim}
-\par
-Obs.: \textbf{A partir de outubro de 2020, o GitHub alterou o nome da branch padrão de "master" para "main" em novos repositórios. Portanto, é recomendável usar "main" como a branch padrão para novos projetos.}
-\par
-\section{Comandos Básicos do Git e GitHub-CLI}
-Aqui estão alguns comandos básicos do Git e do GitHub-CLI que você deve conhecer para começar a trabalhar com repositórios no GitHub.
-\par
-\subsection{Comandos Básicos do Git}
-\begin{itemize}
-  \item \textbf{git init}: Inicializa um novo repositório Git local.
-  \item \textbf{git clone <url>}: Clona um repositório remoto para o seu computador.
-  \item \textbf{git status}: Exibe o status atual do repositório, mostrando arquivos modificados, não rastreados e prontos para commit.
-  \item \textbf{git add <arquivo>}: Adiciona um arquivo específico ao estágio para commit.
-  \item \textbf{git add .}: Adiciona todos os arquivos modificados ao estágio para commit.
-  \item \textbf{git commit -m "mensagem"}: Cria um commit com uma mensagem descritiva.
-  \item \textbf{git push}: Envia os commits locais para o repositório remoto.
-  \item \textbf{git pull}: Puxa as alterações do repositório remoto para o repositório local.
-  \item \textbf{git branch}: Lista todas as branches no repositório.
-  \item \textbf{git checkout <branch>}: Muda para a branch especificada.
-  \item \textbf{git branch -M <branch>}: Renomeia a branch atual para o nome especificado forçando a sobrescrita se a branch especificada já existir.
-  \item \textbf{git branch -m <branch>}: Renomeia a branch atual para o nome especificado e falha se a branch especificada já existir.
-  \item \textbf{git checkout -b <branch>}: Cria uma nova branch e muda para ela.
-  \item \textbf{git branch -d <branch>}: Deleta a branch especificada.
-  \item \textbf{git remote rm origin}: Remove o repositório remoto chamado "origin".
-  \item \textbf{git remote add origin <url>}: Adiciona um repositório remoto com o nome "origin".
-  \item \textbf{git remote -v}: Exibe os repositórios remotos configurados.
-  \item \textbf{git merge <branch>}: Mescla a branch especificada na branch atual.
-  \item \textbf{Veja mais comandos do Git na tabela \ref{tab:gitcommands}, p.\pageref{tab:gitcommands}.}
-\end{itemize}
-\par
-\subsection{Comandos Básicos do GitHub-CLI}
-\begin{itemize}
-  \item \textbf{gh auth login}: Autentica o usuário no GitHub-CLI.
-  \item \textbf{gh repo create <nome-do-repositorio>}: Cria um novo repositório no GitHub.
-  \item \textbf{gh repo clone <nome-do-repositorio>}: Clona um repositório do GitHub para o seu computador.
-  \item \textbf{gh issue create}: Cria uma nova issue no repositório atual.
-  \item \textbf{gh pr create}: Cria um novo pull request.
-  \item \textbf{gh pr checkout <numero-do-pr>}: Faz checkout de um pull request específico.
-  \item \textbf{gh pr merge <numero-do-pr>}: Mescla um pull request específico.
-  \item \textbf{gh repo view}: Exibe informações sobre o repositório atual.
-  \item \textbf{gh gist create <arquivo>}: Cria um novo gist com o arquivo especificado.
-  \item \textbf{Veja mais comandos do GitHub-CLI na tabela \ref{tab:githubcli_commands}, p.\pageref{tab:githubcli_commands}.}
-\end{itemize}
-\par
+
+\begin{aviso}[Token é senha]
+Não compartilhe o token nem o grave em arquivos do projeto. Evite o
+\texttt{git config credential.helper store}: ele salva o token em texto puro
+no arquivo \arq{\textasciitilde/.git-credentials}. O Git Credential Manager
+(Windows) e o \texttt{gh auth setup-git} guardam as credenciais de forma
+segura.
+\end{aviso}
+
+% ----------------------------------------------------------------------
+\section{Comandos do dia a dia}
+% ----------------------------------------------------------------------
+
+\begin{table}[H]
+  \centering
+  \caption{Comandos básicos do Git}
+  \label{tab:git_basico}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    \textbf{Comando} & \textbf{O que faz} \\
+    \midrule
+    \comando{git init} & transforma a pasta atual num repositório \\
+    \comando{git clone <url>} & baixa uma cópia completa de um repositório \\
+    \comando{git status} & mostra o que mudou e o que está preparado \\
+    \comando{git add <arquivo>} & prepara um arquivo para o próximo commit \\
+    \comando{git commit -m "..."} & registra as alterações preparadas \\
+    \comando{git log --oneline} & mostra o histórico, um commit por linha \\
+    \comando{git switch <branch>} & troca de branch \\
+    \comando{git switch -c <branch>} & cria uma branch e já entra nela \\
+    \comando{git restore <arquivo>} & descarta alterações não preparadas \\
+    \comando{git pull} & baixa e integra as novidades do remoto \\
+    \comando{git push} & envia os seus commits para o remoto \\
+    \comando{git merge <branch>} & traz as alterações de outra branch \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Comandos básicos do GitHub CLI}
+  \label{tab:gh_basico}
+  \begin{tabularx}{\textwidth}{@{}l X@{}}
+    \toprule
+    \textbf{Comando} & \textbf{O que faz} \\
+    \midrule
+    \comando{gh auth login} & faz o login \\
+    \comando{gh auth status} & mostra com qual conta você está logado \\
+    \comando{gh repo create} & cria um repositório no GitHub \\
+    \comando{gh repo clone <dono>/<repo>} & clona um repositório pelo nome \\
+    \comando{gh repo fork <dono>/<repo>} & cria um fork na sua conta \\
+    \comando{gh pr create} & abre um Pull Request da branch atual \\
+    \comando{gh pr list} & lista os Pull Requests abertos \\
+    \comando{gh run list} & mostra as execuções do GitHub Actions \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+As listas completas estão nos Apêndices~\ref{ap:git}
+e~\ref{ap:gh}.
+
+\begin{dica}[switch e checkout]
+Tutoriais antigos usam \comando{git checkout} para trocar e criar branches.
+Ele ainda funciona, mas mistura funções demais. O \comando{git switch} (para
+branches) e o \comando{git restore} (para arquivos) foram criados para
+separar essas tarefas e são mais seguros para quem está começando.
+\end{dica}

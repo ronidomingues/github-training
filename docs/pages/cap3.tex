@@ -1,50 +1,191 @@
-\chapter{Winget}
-\par
-\section{O que é?}
-O Winget, ou Windows Package Manager, é uma ferramenta de linha de comando para Windows que permite instalar, atualizar e gerenciar aplicativos de forma simples e eficiente. Ele foi desenvolvido pela Microsoft e é uma solução nativa para gerenciamento de pacotes no Windows.
+% ======================================================================
+\chapter{Preparando o ambiente}
+\label{cap:ambiente}
+% ======================================================================
 
-Para maiores informações e entendimento veja a documentação em \cite{microsoft_winget}.
-\par
-\section{Porque usar nessa capacitação?}
-Para que todos possam acompanhar de maneira eficaz essa capacitação, preciso que todos tenham as ferramentas git e GitHub CLI instaladas em suas máquinas. Para facilitar esse processo, utilizaremos o Winget, que é o gerenciador de pacotes nativo do Windows.
-O Winget é um gerenciador de pacotes para Windows que facilita a instalação, atualização e remoção de aplicativos. Com ele, é possível automatizar a configuração do ambiente de desenvolvimento, economizando tempo e esforço.
-\par
-\subsection{Instalação}
-\par
-\begin{citacao}
-A ferramenta de linha de comando do WinGet só tem suporte no Windows 10 versão 1809 (build 17763) ou posterior. 
-O WinGet não estará disponível até que você tenha feito logon no Windows como usuário pela primeira vez, 
-o que fará com que a Microsoft Store registre o Gerenciador de Pacotes do Windows como parte de um processo assíncrono. 
-Se você tiver feito logon recentemente como usuário pela primeira vez e o WinGet ainda não estiver disponível, 
-abra o PowerShell e insira o seguinte comando para solicitar o registro dele: 
+Duas ferramentas acompanham toda a capacitação:
 
-\texttt{Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller\_8wekyb3d8bbwe.}
-\citeonline{microsoft_winget}.
-\end{citacao}
+\begin{itemize}
+  \item o \textbf{Git}, que controla as versões no seu computador;
+  \item o \textbf{GitHub CLI} (\texttt{gh}), que opera o GitHub pelo terminal:
+        cria repositórios, abre Pull Requests e faz o login.
+\end{itemize}
 
-\begin{enumerate}
-  \item Verifique se o Winget já está instalado no seu sistema. Abra o Prompt de Comando ou PowerShell e digite
-  \begin{verbatim}
-    winget --version
-  \end{verbatim}
-  Se o comando retornar uma versão, o Winget já está instalado.
-  \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{./assets/images/07_winget_installed.png}
-    \caption{Verificando se o Winget está instalado.}
-    \label{fig:winget_installed}
-  \end{figure}
-  \item Caso o Winget não esteja instalado, você pode baixá-lo como parte do aplicativo "App Installer" da Microsoft Store. Acesse a Microsoft Store, procure por "App Installer" e clique em "Obter" para instalar. Caso enfrente alguma dificuldade, acesse a documentação em \cite{microsoft_winget}.
-  \item Após a instalação, reinicie o Prompt de Comando ou PowerShell e verifique novamente a instalação com:
-  \begin{verbatim}
-    winget --version
-  \end{verbatim}
-  O comando deve retornar a versão do Winget instalada.
-\end{enumerate}
-\par
-\subsubsection{Atualização}
-Para garantir que você está utilizando a versão mais recente do Winget, execute o comando:
-\begin{verbatim}
-  winget upgrade --all
-\end{verbatim}
-Este comando atualizará todos os pacotes instalados, incluindo o próprio Winget, se houver uma atualização disponível.
+Siga só a seção do seu sistema.
+
+% ----------------------------------------------------------------------
+\section{Windows}
+% ----------------------------------------------------------------------
+
+No Windows, a instalação é feita pelo \textbf{winget}, o gerenciador de pacotes
+da Microsoft \cite{microsoft_winget}. Ele vem no Windows 11 e nas versões
+atuais do Windows 10 (a partir da 1809), como parte do aplicativo
+\emph{App Installer}.
+
+\subsection{Conferir o winget}
+
+Abra o \textbf{PowerShell} (menu Iniciar \(\rightarrow\) digite
+\enquote{PowerShell}) e rode:
+
+\begin{bashcode}
+winget --version
+\end{bashcode}
+
+Se aparecer um número de versão (Figura~\ref{fig:winget_installed}), está
+pronto. Se o comando não for reconhecido, abra a Microsoft Store, procure
+\enquote{App Installer} e atualize ou instale.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/07_winget_installed.png}
+  \caption{Conferindo o winget}
+  \label{fig:winget_installed}
+\end{figure}
+
+\begin{dica}[Primeiro uso]
+Na primeira vez, o winget pede para aceitar os termos de uso das fontes de
+pacotes. Digite \texttt{Y} e aperte \tecla{Enter}.
+\end{dica}
+
+\subsection{Instalar o Git}
+
+O \texttt{winget search} mostra o identificador (\emph{Id}) de cada programa
+(Figura~\ref{fig:winget_search}). O Id do Git é \texttt{Git.Git}:
+
+\begin{bashcode}
+winget search git
+winget install --id Git.Git -e --source winget
+\end{bashcode}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/08_winget_search.png}
+  \caption{Buscando o Git no winget}
+  \label{fig:winget_search}
+\end{figure}
+
+A opção \texttt{-e} exige o Id exato, e \texttt{--source winget} evita a
+Microsoft Store. É a forma recomendada pelo site oficial do Git
+\cite{git_windows}. Aguarde o fim da instalação
+(Figura~\ref{fig:install_git}).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/09_install_git.png}
+  \caption{Instalação do Git}
+  \label{fig:install_git}
+\end{figure}
+
+O Git para Windows já traz o \textbf{Git Bash}, o terminal que usaremos daqui
+em diante, o \textbf{Git LFS} (capítulo~\ref{cap:lfs}) e o \textbf{Git
+Credential Manager}, que guarda o seu login com segurança.
+
+\subsection{Instalar o GitHub CLI}
+
+\begin{bashcode}
+winget install --id GitHub.cli
+\end{bashcode}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/11_install_cli.png}
+  \caption{Instalando o GitHub CLI}
+  \label{fig:install_cli}
+\end{figure}
+
+\subsection{Conferir}
+
+\textbf{Feche o terminal e abra o Git Bash} (menu Iniciar \(\rightarrow\)
+\enquote{Git Bash}). O terminal precisa ser reaberto para enxergar os
+programas recém-instalados.
+
+\begin{bashcode}
+git --version
+gh --version
+\end{bashcode}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/10_git_version.png}
+  \caption{Versão do Git}
+  \label{fig:git_version}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{./assets/images/12_cli_version.png}
+  \caption{Versão do GitHub CLI}
+  \label{fig:cli_version}
+\end{figure}
+
+\begin{dica}[Atualizar depois]
+Para atualizar um programa específico: \texttt{winget upgrade --id Git.Git}.
+Evite o \texttt{winget upgrade --all} no meio da aula: ele atualiza todos os
+programas do computador e pode demorar bastante.
+\end{dica}
+
+% ----------------------------------------------------------------------
+\section{Linux (Debian e Ubuntu)}
+% ----------------------------------------------------------------------
+
+O Git está nos repositórios da distribuição:
+
+\begin{bashcode}
+sudo apt update
+sudo apt install git git-lfs
+\end{bashcode}
+
+O GitHub CLI tem repositório próprio. Este é o comando oficial
+\cite{gh_linux}. Copie inteiro: as barras invertidas no fim das linhas unem
+tudo num comando só.
+
+\begin{bashcode}
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+  && sudo mkdir -p -m 755 /etc/apt/keyrings \
+  && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+  && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+  && sudo apt update \
+  && sudo apt install gh -y
+\end{bashcode}
+
+\begin{aviso}[Evite o pacote gh da distribuição]
+Os mantenedores do GitHub CLI desaconselham o \texttt{gh} empacotado pela
+comunidade Debian: algumas versões antigas dele deixaram de funcionar com as
+APIs atuais do GitHub \cite{gh_linux}. Use o repositório oficial acima.
+\end{aviso}
+
+Outras distribuições (Fedora, Arch, openSUSE) estão em
+\url{https://github.com/cli/cli/blob/trunk/docs/install_linux.md}.
+
+% ----------------------------------------------------------------------
+\section{macOS}
+% ----------------------------------------------------------------------
+
+O caminho mais simples é o \textbf{Homebrew} (\url{https://brew.sh}). Com ele
+instalado:
+
+\begin{bashcode}
+brew install git git-lfs gh
+\end{bashcode}
+
+\begin{dica}
+Sem o Homebrew, rodar \texttt{git --version} no Terminal oferece instalar as
+\emph{Command Line Tools} da Apple, que trazem o Git. O GitHub CLI, nesse
+caso, é instalado pelo pacote em \url{https://cli.github.com}.
+\end{dica}
+
+% ----------------------------------------------------------------------
+\section{Conferindo nos três sistemas}
+% ----------------------------------------------------------------------
+
+\begin{bashcode}
+git --version
+gh --version
+git lfs version
+\end{bashcode}
+
+Os três devem responder com um número de versão. Se algum comando não for
+reconhecido, feche e reabra o terminal. Se continuar, reinstale a ferramenta.

@@ -1,26 +1,33 @@
-% !TeX program = pdflatex
+% !TeX program = xelatex
 % !TeX encoding = UTF-8
 % !TeX spellcheck = pt_BR
+% ----------------------------------------------------------------------
+% Guia Prático para a Capacitação de Git e GitHub
+% Compilar com XeLaTeX (a fonte Lexend é carregada localmente):
+%     latexmk -xelatex guia.tex
+% ----------------------------------------------------------------------
 
 \documentclass[12pt, a4paper, openright, oneside, brazil]{abntex2}
 
-% Inclui o preâmbulo com todos os pacotes
 \input{pages/preambulo}
-% Inclui as configurações
 \input{pages/config}
 
-% Informações para CAPA e FOLHA DE ROSTO
-\title{Capacitação em GitHub}
-\author{Ronivaldo Domingues de Andrade}
+% --- Informações da capa e da folha de rosto --------------------------
+\titulo{Git e GitHub na Prática: do Primeiro Commit à Automação}
+\autor{Ronivaldo Domingues de Andrade}
 \local{Rio de Janeiro - RJ}
-\data{2025}
+\data{Edição 2025 · Revisão 2026}
 \tipotrabalho{Guia Prático para Capacitação}
-\preambulo{Guia Prático para Capacitação em GitHub}
+\preambulo{Guia prático da capacitação de Git e GitHub, com duração de duas
+horas, elaborado para os membros da liga acadêmica. Cobre conta e benefícios
+de estudante, instalação no Windows, no Linux e no macOS, Git, GitHub CLI,
+Git LFS, commits, merges, Pull Requests, GitHub Pages, GitHub Actions e
+assinatura de commits.}
 
 \begin{document}
 \selectlanguage{brazil}
 
-% Elementos pré-textuais
+% --- Elementos pré-textuais -------------------------------------------
 \imprimircapa
 \imprimirfolhaderosto
 
@@ -30,47 +37,40 @@
 \newpage
 \listoftables
 
-% Lista de siglas
 \begin{siglas}
-  \item[Winget] Windows Package Manager
-  \item[GitHub] Plataforma de Controle de Versão Distribuído
-  \item[git] Sistema de Controle de Versão Distribuído
-  \item[gh] GitHub CLI (Command Line Interface)
-  \item[git-lfs] Sistema de Controle de Versão Distribuído para Arquivos Grandes
-  \item[Merge] Fusão de Branches no GitHub
-  \item[Branch] Rama (branch) em um repositório GitHub
-  \item[Commit] Confirmação de Modificações em um Branch
-  \item[GitHub Pages] Serviço de Hospedagem de Páginas Estáticas
-  \item[GitHub Actions] Plataforma de Automação de Fluxos de Trabalho
-  \item[Pull Request (PR)] Solicitação de Mesclagem de Código
-  \item[Markdown] Linguagem de Marcação Leve
-  \item[README] Arquivo de Documentação do Projeto
-  \item[.gitignore] Arquivo de Configuração para Ignorar Arquivos no Git
-  \item[LICENSE] Arquivo de Licença do Projeto
-  \item[MIT] Licença MIT -> Massachusetts Institute of Technology License
-  \item[YML] YAML Ain't Markup Language -> YAML Não é uma Linguagem de Marcação de Texto, mas sim uma sintaxe para arquivos YAML
-  \item[GPG] GNU Privacy Guard -> Guarda de Privacidade GNU, ferramenta de criptografia de dados e comunicação segura.
+  \item[2FA] \emph{Two-Factor Authentication}, autenticação em dois fatores
+  \item[CI/CD] \emph{Continuous Integration / Continuous Delivery}, integração e entrega contínuas
+  \item[CLI] \emph{Command Line Interface}, interface de linha de comando
+  \item[GCM] \emph{Git Credential Manager}, gerenciador de credenciais do Git
+  \item[GPG] \emph{GNU Privacy Guard}, programa de criptografia e assinatura digital
+  \item[LFS] \emph{Large File Storage}, extensão do Git para arquivos grandes
+  \item[PAT] \emph{Personal Access Token}, token de acesso pessoal
+  \item[PR] \emph{Pull Request}, pedido de integração de uma branch em outra
+  \item[SSH] \emph{Secure Shell}, protocolo de acesso seguro por par de chaves
+  \item[YAML] \emph{YAML Ain't Markup Language}, formato dos arquivos de workflow
 \end{siglas}
 
 \tableofcontents
 
-% Capítulos do trabalho
-\input{pages/cap1}    % Introdução
-\input{pages/cap2}    % GitHub
-\input{pages/cap3}    % Winget
-\input{pages/cap4}    % Git e GitHub CLI
-\input{pages/cap5}    % Repositórios
-\input{pages/cap6}    % Branches
-\input{pages/cap7}    % Commits e PRs
-\input{pages/cap8}    % Colaboração
-\input{pages/cap9}    % CI/CD
-\input{pages/conclusao}    % Conclusão
+% --- Capítulos ---------------------------------------------------------
+\input{pages/cap1}          % Introdução e roteiro
+\input{pages/cap2}          % A conta no GitHub e os benefícios de estudante
+\input{pages/cap3}          % Preparando o ambiente (Windows, Linux, macOS)
+\input{pages/cap4}          % Git e GitHub CLI: configuração e autenticação
+\input{pages/cap5}          % Git LFS
+\input{pages/cap6}          % Commits, merges e Pull Requests
+\input{pages/cap7}          % Padrões de commit
+\input{pages/cap8}          % GitHub Pages e GitHub Actions
+\input{pages/cap9}          % Assinatura de commits (GPG e SSH)
+\input{pages/cap10}         % Exercícios práticos
+\input{pages/conclusao}     % Conclusão
 
-% Referências
+% --- Referências -------------------------------------------------------
+\nocite{conventional_commits,adorno_commits,iuricode_commits,git_docs}   % fontes consultadas, mesmo sem citação no texto
 \bibliographystyle{abntex2-alf}
 \bibliography{pages/references}
 
-% Elementos pós-textuais
+% --- Elementos pós-textuais -------------------------------------------
 \input{pages/apendices}
 \input{pages/anexos}
 
