@@ -1,18 +1,18 @@
-\chapter{Comandos GitHub CLI}
-\label{ap:comandos_github_cli}
+\chapter{Comandos do GitHub CLI}
+\label{ap:gh}
 
-Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (gh) organizados por funcionalidade.
-
-\section*{Comandos do GitHub-CLI (gh)}
+Referência dos principais comandos do GitHub CLI (\texttt{gh}), organizados
+por grupo. A lista completa, sempre atualizada, está no manual oficial
+\cite{gh_manual}.
 
 \begin{longtable}{|p{2cm}|p{2.3cm}|p{4cm}|p{6cm}|}
-    \caption{Comandos do GitHub-CLI (gh)} \label{tab:githubcli_commands} \\
+    \caption{Comandos do GitHub CLI (gh)} \label{tab:githubcli_commands} \\
     \hline
     \textbf{Comando Base} & \textbf{Subcomando} & \textbf{Explicação Funcional Detalhada} & \textbf{Exemplo de Sintaxe Chave} \\
     \hline
     \endfirsthead
     \multicolumn{4}{c}%
-    {\textbf{Continuação da Tabela: Comandos do GitHub-CLI (gh)}} \\
+    {\textbf{Continuação da Tabela: Comandos do GitHub CLI (gh)}} \\
     \hline
     \textbf{Comando Base} & \textbf{Subcomando} & \textbf{Explicação Funcional Detalhada} & \textbf{Exemplo de Sintaxe Chave} \\
     \hline
@@ -44,9 +44,7 @@ Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (
     \hline
     gh browse & -{-}commit & Abre um commit específico no navegador & \texttt{gh browse -{-}commit abc123} \\
     \hline
-    gh browse & -{-}issue & Abre uma issue específica no navegador & \texttt{gh browse -{-}issue 42} \\
-    \hline
-    gh browse & -{-}pull-request & Abre um pull request específico no navegador & \texttt{gh browse -{-}pull-request 15} \\
+    gh browse & <número> & Abre a issue ou o pull request de número informado no navegador & \texttt{gh browse 42} \\
     \hline
     gh browse & -{-}settings & Abre as configurações do repositório no navegador & \texttt{gh browse -{-}settings} \\
     \hline
@@ -58,13 +56,13 @@ Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (
     \hline
     gh codespace & create & Cria um novo codespace & \texttt{gh codespace create} \\
     \hline
-    gh codespace & delete & Remove um codespace específico & \texttt{gh codespace delete my-codespace} \\
+    gh codespace & delete & Remove um codespace específico & \texttt{gh codespace delete -c my-codespace} \\
     \hline
     gh codespace & jupyter & Abre um codespace no JupyterLab & \texttt{gh codespace jupyter} \\
     \hline
     gh codespace & list & Lista todos os codespaces disponíveis & \texttt{gh codespace list} \\
     \hline
-    gh codespace & logs & Exibe os logs de um codespace específico & \texttt{gh codespace logs my-codespace} \\
+    gh codespace & logs & Exibe os logs de um codespace específico & \texttt{gh codespace logs -c my-codespace} \\
     \hline
     gh codespace & ports & Lista as portas encaminhadas de um codespace & \texttt{gh codespace ports} \\
     \hline
@@ -74,7 +72,7 @@ Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (
     \hline
     gh codespace & ssh & Conecta-se a um codespace via SSH & \texttt{gh codespace ssh} \\
     \hline
-    gh codespace & stop & Para um codespace em execução & \texttt{gh codespace stop my-codespace} \\
+    gh codespace & stop & Para um codespace em execução & \texttt{gh codespace stop -c my-codespace} \\
     \hline
     gh gist & create & Cria um novo gist a partir de arquivos ou entrada padrão & \texttt{gh gist create script.py} \\
     \hline
@@ -110,21 +108,21 @@ Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (
     \hline
     gh issue & view & Exibe detalhes de uma issue específica & \texttt{gh issue view 42} \\
     \hline
-    gh project & copy & Copia um projeto para um novo repositório ou organização & \texttt{gh project copy 1 -{-}draft -{-}target-owner novaorg} \\
+    gh project & copy & Copia um projeto para outro dono (usuário ou organização) & \texttt{gh project copy 1 -{-}source-owner @me -{-}target-owner novaorg -{-}title "Cópia" -{-}drafts} \\
     \hline
-    gh project & create & Cria um novo projeto & \texttt{gh project create -{-}title "Meu Projeto"} \\
+    gh project & create & Cria um novo projeto & \texttt{gh project create -{-}owner @me -{-}title "Meu Projeto"} \\
     \hline
-    gh project & delete & Remove um projeto específico & \texttt{gh project delete 1} \\
+    gh project & delete & Remove um projeto específico & \texttt{gh project delete 1 -{-}owner @me} \\
     \hline
-    gh project & edit & Edita as propriedades de um projeto & \texttt{gh project edit 1 -{-}title "Novo Título"} \\
+    gh project & edit & Edita as propriedades de um projeto & \texttt{gh project edit 1 -{-}owner @me -{-}title "Novo Título"} \\
     \hline
-    gh project & field & Gerencia campos personalizados do projeto & \texttt{gh project field create 1 -{-}name "Prioridade"} \\
+    gh project & field-create & Cria um campo personalizado no projeto & \texttt{gh project field-create 1 -{-}owner @me -{-}name "Prioridade" -{-}data-type TEXT} \\
     \hline
-    gh project & item & Gerencia itens dentro de um projeto & \texttt{gh project item add 1 -{-}url \url{https://github.com/owner/repo/issues/1}} \\
+    gh project & item-add & Adiciona uma issue ou um pull request ao projeto & \texttt{gh project item-add 1 -{-}owner @me -{-}url \url{https://github.com/owner/repo/issues/1}} \\
     \hline
     gh project & list & Lista projetos disponíveis & \texttt{gh project list -{-}owner owner} \\
     \hline
-    gh project & view & Visualiza detalhes de um projeto específico & \texttt{gh project view 1} \\
+    gh project & view & Visualiza detalhes de um projeto específico & \texttt{gh project view 1 -{-}owner @me} \\
     \hline
     gh pr & checks & Exibe os status checks de um pull request & \texttt{gh pr checks 15} \\
     \hline
@@ -189,8 +187,6 @@ Este apêndice apresenta uma referência dos principais comandos do GitHub CLI (
     gh repo & view & Exibe detalhes de um repositório & \texttt{gh repo view owner/repo} \\
     \hline
     gh repo & deploy-key & Gerencia chaves de deploy do repositório & \texttt{gh repo deploy-key add chave.pub -{-}title "Servidor"} \\
-    \hline
-    gh repo & secret & Gerencia secrets do repositório & \texttt{gh repo secret set API\textunderscore KEY -{-}body "valor"} \\
     \hline
     gh run & cancel & Cancela uma execução de workflow & \texttt{gh run cancel 123456789} \\
     \hline

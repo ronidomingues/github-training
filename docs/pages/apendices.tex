@@ -1,12 +1,37 @@
-% ----------------------------------------------------------------------------------------------------------------------
-% Apêndices do trabalho (se houver);
-% ----------------------------------------------------------------------------------------------------------------------
+% ======================================================================
+% Apêndices
+% ======================================================================
 \begin{apendicesenv}
 \partapendices
 
-% Inclui os apêndices separados
 \input{pages/apendice_comandos_git}
 \input{pages/apendice_comandos_github_cli}
-\input{pages/apendice_padroes_de_commits}
+
+% ----------------------------------------------------------------------
+\chapter{Glossário}
+\label{ap:glossario}
+
+\begin{description}
+  \item[Branch] Linha de desenvolvimento dentro do histórico; tecnicamente, um
+        ponteiro para um commit.
+  \item[Clone] Cópia completa de um repositório remoto no seu computador.
+  \item[Commit] Registro de um estado do projeto, com autor, data e mensagem.
+  \item[Conflito] Situação em que duas alterações na mesma região de um
+        arquivo não podem ser combinadas automaticamente.
+  \item[Fork] Cópia de um repositório de outra pessoa na sua conta, para você
+        propor mudanças por Pull Request.
+  \item[GitHub Actions] Plataforma de automação do GitHub, descrita em
+        arquivos YAML.
+  \item[GitHub Pages] Hospedagem de sites estáticos a partir de um
+        repositório.
+  \item[.gitignore] Arquivo que lista o que o Git não deve versionar.
+  \item[Merge] Integração de duas linhas de histórico.
+  \item[Origin] Nome padrão do repositório remoto principal.
+  \item[Pull Request] Pedido para integrar uma branch em outra, com revisão.
+  \item[README] Arquivo de apresentação do repositório, em Markdown.
+  \item[Remoto] Cópia do repositório em outro lugar, como o GitHub.
+  \item[Repositório] Pasta cujo histórico é controlado pelo Git.
+  \item[Workflow] Processo automatizado do GitHub Actions.
+\end{description}
 
 \end{apendicesenv}

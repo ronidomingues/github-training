@@ -1,9 +1,8 @@
-\chapter{Comandos Git}
-\label{ap:comandos_git}
+\chapter{Comandos do Git}
+\label{ap:git}
 
-Este apêndice apresenta uma referência completa dos principais comandos Git organizados por categoria e funcionalidade.
-
-\section*{Comandos Git}
+Referência dos principais comandos do Git, organizados por categoria. A
+documentação completa está em \url{https://git-scm.com/docs}.
 
 \begin{longtable}{|p{3cm}|p{4cm}|p{7cm}|}
     \caption{Comandos do Git} \label{tab:gitcommands} \\
@@ -22,7 +21,7 @@ Este apêndice apresenta uma referência completa dos principais comandos Git or
     \endfoot
     \endlastfoot
 
-    git init & Configuração/Setup & Transforma o diretório atual em um repositório Git, criando o diretório.git. Pode ser executado com segurança em um diretório existente sem sobrescrever configurações. \\
+    git init & Configuração/Setup & Transforma o diretório atual em um repositório Git, criando o diretório \texttt{.git}. Pode ser executado com segurança em um diretório existente sem sobrescrever configurações. \\
     \hline
     git config & Configuração/Setup & Lê ou define variáveis de configuração em nível de sistema, global ou local. Essencial para definir a identidade (user.name, user.email) do autor do commit. \\
     \hline
@@ -90,7 +89,7 @@ Este apêndice apresenta uma referência completa dos principais comandos Git or
     \hline
     git tag -a [name] & Marcação/Utilitários & Cria uma tag anotada (com metadados e mensagem), preferida para releases públicas. \\
     \hline
-    git stash & Utilitários de Contexto & Salva temporariamente o Working Directory e o Index (alterações não comitadas) para permitir a troca de contexto. \\
+    git stash & Utilitários de Contexto & Salva temporariamente o Working Directory e o Index (alterações ainda sem commit) para permitir a troca de contexto. \\
     \hline
     git stash pop & Utilitários de Contexto & Aplica o último stash salvo e o remove da lista de stashes. \\
     \hline

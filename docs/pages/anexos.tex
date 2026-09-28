@@ -1,10 +1,23 @@
-% ----------------------------------------------------------------------------------------------------------------------
-% Anexos do trabalho (se houver);
-% ----------------------------------------------------------------------------------------------------------------------
+% ======================================================================
+% Anexos
+% ======================================================================
 \begin{anexosenv}
 \partanexos
-\chapter{Lista de Presença}
-\par
-\section{Listab de dos mebros presentes na capacitação}
-\input{./pages/presence_list.tex}
+
+\chapter{Lista de presença}
+\label{an:presenca}
+
+Participantes que registraram a presença por Pull Request
+(Exercício~7, seção~\ref{sec:ex_presenca}). A data é a do momento em que o
+Pull Request foi integrado ao repositório.
+
+% O arquivo abaixo é gerado por scripts/generate_presence_list.py a partir da
+% pasta presences/. Sem ele (compilação local), o guia avisa em vez de falhar.
+\IfFileExists{pages/presence_list.tex}{%
+  \input{pages/presence_list.tex}%
+}{%
+  \textit{Lista gerada automaticamente na compilação do repositório. Rode
+  \texttt{python3 scripts/generate\_presence\_list.py} para gerá-la localmente.}%
+}
+
 \end{anexosenv}
