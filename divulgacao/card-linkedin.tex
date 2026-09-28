@@ -1,0 +1,39 @@
+% Card quadrado para o feed do LinkedIn (exportar em 1080x1080).
+\documentclass{article}
+\usepackage[paperwidth=20cm,paperheight=20cm,margin=0pt]{geometry}
+\input{card-comum.tex}
+\newcommand{\commit}[3][lightpurple]{\fill[darkpurple] (#2,#3) circle (0.28); \draw[#1, line width=2.4pt] (#2,#3) circle (0.28);}
+\begin{document}
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[darkpurple] (current page.south west) rectangle (current page.north east);
+  \node[anchor=center, opacity=0.18] at ([xshift=5.2cm,yshift=3.2cm]current page.center) {\simbolo{9cm}};
+  \node[anchor=north west, inner sep=0pt] at ([xshift=1.4cm,yshift=-1.3cm]current page.north west) {\logo{4.2cm}};
+
+  % grafo: main, uma branch que sai e volta num merge
+  \begin{scope}[shift={([xshift=1.9cm,yshift=-5.2cm]current page.north west)}]
+    \draw[white, line width=2.4pt] (0,0) -- (11.5,0);
+    \draw[yellow, line width=2.4pt] (2.6,0) to[out=0,in=180] (4.6,1.5) -- (8.2,1.5) to[out=0,in=180] (10.2,0);
+    \foreach \x in {0,2.6,6.4,11.5}{\commit[white]{\x}{0}}
+    \foreach \x in {4.6,6.4,8.2}{\commit[yellow]{\x}{1.5}}
+    \fill[yellow] (10.2,0) circle (0.36);
+    \node[anchor=west, text=white, font=\lexendsemibold\small] at (11.9,0) {main};
+    \node[anchor=west, text=yellow, font=\lexendsemibold\small] at (8.6,1.9) {feature};
+  \end{scope}
+
+  \node[anchor=north west, text=yellow, font=\lexendsemibold\small] (k) at ([xshift=1.4cm,yshift=-8.2cm]current page.north west)
+    {CAPACITAÇÃO \,·\, GUIA \,·\, SLIDES \,·\, EXERCÍCIOS};
+  \node[anchor=north west, text=white, inner xsep=0pt, font=\bfseries\fontsize{50}{56}\selectfont] (t) at ([yshift=-2mm]k.south west)
+    {\tit{Git e GitHub}};
+  \node[anchor=north west, text=white, inner xsep=0pt, text width=17.2cm, align=left, font=\lexendlight\large] (s) at ([yshift=-3mm]t.south west)
+    {Do primeiro commit à automação: conta e 2FA, branches, conflitos, Pull Requests, GitHub Pages, GitHub Actions e commits assinados.};
+
+  \coordinate (n) at ([xshift=1.4cm,yshift=-14.3cm]current page.north west);
+  \numero{n}{88}{páginas de guia, com passo a passo}
+  \numero{$(n)+(4.4,0)$}{9}{exercícios práticos com respostas}
+  \numero{$(n)+(8.8,0)$}{3}{sistemas: Windows, Linux e macOS}
+  \numero{$(n)+(13.2,0)$}{2h}{de capacitação, sem pré-requisitos}
+
+  \node[anchor=south west, text=white, font=\lexendsemibold\small] at ([xshift=1.4cm,yshift=0.9cm]current page.south west) {Ronivaldo D. Andrade \,·\, Diretor de Projetos};
+  \node[anchor=south east, text=yellow, font=\ttfamily\small] at ([xshift=-1.4cm,yshift=0.9cm]current page.south east) {andradasdev.github.io/github};
+\end{tikzpicture}
+\end{document}
