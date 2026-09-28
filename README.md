@@ -72,7 +72,7 @@ Este é o repositório de **código**. A cada push na `main`, o workflow
    o site no GitHub Pages.
 
 A versão com notas do apresentador fica só aqui. O envio usa o secret
-`TRAINING_ANDRADASDEV`; o passo a passo para criá-lo está em
+`GHUB_ANDRADASDEV`; o passo a passo para criá-lo está em
 [`andradasdev/github/documentacao`](https://github.com/andradasdev/github/blob/main/documentacao/autenticacao-github-actions.md).
 
 ## 🛠️ Compilar localmente

@@ -10,7 +10,7 @@ name: Compilar LaTeX e publicar em andradasdev/github
 #   5. envia os artefatos de publicação para andradasdev/github,
 #      onde um segundo workflow os publica no GitHub Pages.
 #
-# PRÉ-REQUISITO: o secret TRAINING_ANDRADASDEV precisa existir neste
+# PRÉ-REQUISITO: o secret GHUB_ANDRADASDEV precisa existir neste
 # repositório. O passo a passo de como criá-lo está em:
 #   https://github.com/andradasdev/github/blob/main/documentacao/autenticacao-github-actions.md
 # (O GitHub não aceita nomes de secret começando com GITHUB_.)
@@ -138,18 +138,18 @@ jobs:
       # (apresentacao_notes.pdf) NÃO vai: ela contém o roteiro da aula.
       - name: Verificar se o token de publicação existe
         env:
-          PUBLISH_TOKEN: ${{ secrets.TRAINING_ANDRADASDEV }}
+          PUBLISH_TOKEN: ${{ secrets.GHUB_ANDRADASDEV }}
         run: |
           if [ -z "${PUBLISH_TOKEN}" ]; then
-            echo "::error::O secret TRAINING_ANDRADASDEV não está configurado neste repositório."
+            echo "::error::O secret GHUB_ANDRADASDEV não está configurado neste repositório."
             echo "::error::Passo a passo: https://github.com/${REPO_PUBLICACAO}/blob/main/documentacao/autenticacao-github-actions.md"
             exit 1
           fi
-          echo "TRAINING_ANDRADASDEV presente"
+          echo "GHUB_ANDRADASDEV presente"
 
       - name: Enviar artefatos para ${{ env.REPO_PUBLICACAO }}
         env:
-          PUBLISH_TOKEN: ${{ secrets.TRAINING_ANDRADASDEV }}
+          PUBLISH_TOKEN: ${{ secrets.GHUB_ANDRADASDEV }}
         run: |
           set -euo pipefail
           git clone --depth 1 \
