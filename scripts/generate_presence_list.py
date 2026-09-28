@@ -1,38 +1,76 @@
-import os
-from datetime import datetime, timezone
+"""Gera docs/pages/presence_list.tex a partir dos arquivos em presences/.
+
+Cada participante registra presença abrindo um Pull Request que cria o arquivo
+presences/<Nome>.txt (Exercício 7 do guia). A data registrada é a do commit,
+na main, que adicionou o arquivo: com o PR integrado por merge, é a data em que
+o PR foi aceito. Essa data vem do histórico do Git, e não do sistema de
+arquivos: num checkout do CI todos os arquivos têm a mesma data de criação.
+
+Uso (na raiz do repositório):
+    python3 scripts/generate_presence_list.py
+"""
+
+import subprocess
+from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
-# Caminho da pasta onde os arquivos de presença devem estar localizados;
-BASE_PATH = os.path.dirname(os.path.abspath(__file__)) # Determinando como base dos PATHs a seguir o diretório do script "generate_presence_list.py";
-FILES_PATH = os.path.join(BASE_PATH, "..", "presences") # Caminho para a pasta "../presences";
-OUTPUT_FILE = os.path.join(BASE_PATH, "..", "docs", "pages", "presence_list.tex") # Caminho para o arquivo de saída "../materials/presence_list.tex";
+RAIZ = Path(__file__).resolve().parent.parent
+PASTA = RAIZ / "presences"
+SAIDA = RAIZ / "docs" / "pages" / "presence_list.tex"
+FUSO = ZoneInfo("America/Sao_Paulo")
 
-# Coletando todos os arquivos .txt no caminho fornecido;
-files = [file for file in os.listdir(FILES_PATH) if file.endswith('.txt')]
+# Caracteres com significado especial no LaTeX. Sem o escape, um nome como
+# "Ana & João" quebraria a compilação do guia.
+ESCAPES = {
+    "\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$",
+    "#": r"\#", "_": r"\_", "{": r"\{", "}": r"\}",
+    "~": r"\textasciitilde{}", "^": r"\textasciicircum{}",
+}
 
-# Gerando o conteúdo do arquivo LaTeX "presence_list.tex";
-content = []
-content.append("\\begin{tabularx}{\\textwidth}{|>{\\centering\\arraybackslash}X|>{\\centering\\arraybackslash}X|}")
-content.append("\\hline")
-content.append("\\textbf{Nome} & \\textbf{Presente em} \\\\")
-content.append("\\hline")
 
-for name in sorted(files):
-    path = os.path.join(FILES_PATH, name)
-    person_name = os.path.splitext(name)[0]
+def escapar(texto: str) -> str:
+    return "".join(ESCAPES.get(c, c) for c in texto)
 
-    # Obtendo a data de criação do arquivo;
-    timestamp = os.path.getctime(path)
-    utc_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
-    local_time = utc_time.astimezone(ZoneInfo("America/Sao_Paulo"))
-    create_date = local_time.strftime('%d/%m/%Y às %H:%M:%S')
-    content.append(f"   {person_name} & {create_date} \\\\")
-    content.append("\\hline")
-content.append("\\end{tabularx}")
 
-# Garantindo que a pasta materials exista;
-os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+def data_de_entrada(arquivo: Path) -> datetime | None:
+    """Data do commit, na linha principal, que adicionou o arquivo."""
+    caminho = arquivo.relative_to(RAIZ).as_posix()
+    resultado = subprocess.run(
+        ["git", "log", "--first-parent", "--diff-filter=A", "--format=%cI",
+         "-1", "--", caminho],
+        cwd=RAIZ, capture_output=True, text=True, check=False,
+    )
+    iso = resultado.stdout.strip()
+    return datetime.fromisoformat(iso).astimezone(FUSO) if iso else None
 
-# Escrevendo o conteúdo no arquivo de saída;
-with open(OUTPUT_FILE, 'w', encoding='utf-8') as file:
-    file.write('\n'.join(content))
+
+def main() -> None:
+    presencas = []
+    for arquivo in sorted(PASTA.glob("*.txt")):
+        quando = data_de_entrada(arquivo)
+        presencas.append((quando, arquivo.stem))
+
+    # Mais antigos primeiro; arquivos ainda sem commit vão para o fim.
+    presencas.sort(key=lambda p: (p[0] is None, p[0] or datetime.min.replace(tzinfo=FUSO), p[1]))
+
+    linhas = [
+        r"\begin{longtable}{@{}p{0.6\textwidth} p{0.35\textwidth}@{}}",
+        r"\toprule",
+        r"\textbf{Nome} & \textbf{Presença registrada em} \\",
+        r"\midrule",
+        r"\endhead",
+    ]
+    if not presencas:
+        linhas.append(r"\multicolumn{2}{@{}l}{\textit{Nenhuma presença registrada ainda.}} \\")
+    for quando, nome in presencas:
+        data = quando.strftime("%d/%m/%Y às %H:%M") if quando else "ainda sem commit"
+        linhas.append(f"{escapar(nome)} & {data} \\\\")
+    linhas += [r"\bottomrule", r"\end{longtable}"]
+
+    SAIDA.write_text("\n".join(linhas) + "\n", encoding="utf-8")
+    print(f"{len(presencas)} presença(s) em {SAIDA.relative_to(RAIZ)}")
+
+
+if __name__ == "__main__":
+    main()

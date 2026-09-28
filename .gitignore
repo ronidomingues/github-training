@@ -71,3 +71,7 @@ build/
 !*.zip
 !*.rar
 !*.7z
+
+# Gerado na compilação por scripts/generate_presence_list.py (fica depois das
+# regras "!*.tex" acima, senão seria reincluído)
+docs/pages/presence_list.tex
