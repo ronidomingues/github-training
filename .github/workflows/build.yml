@@ -1,0 +1,177 @@
+name: Compilar LaTeX e publicar em andradasdev/github
+
+# ============================================================
+# Este repositório é o de CÓDIGO. Ele não publica site nenhum.
+#
+#   1. gera a lista de presença a partir de presences/;
+#   2. compila o guia e os slides (projeção e notas);
+#   3. verifica se os PDFs saíram íntegros;
+#   4. commita os PDFs de volta AQUI (para quem clona ter o guia);
+#   5. envia os artefatos de publicação para andradasdev/github,
+#      onde um segundo workflow os publica no GitHub Pages.
+#
+# PRÉ-REQUISITO: o secret TRAINING_ANDRADASDEV precisa existir neste
+# repositório. O passo a passo de como criá-lo está em:
+#   https://github.com/andradasdev/github/blob/main/documentacao/autenticacao-github-actions.md
+# (O GitHub não aceita nomes de secret começando com GITHUB_.)
+# ============================================================
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**.pdf'   # não re-disparar pelo commit de PDF feito pelo bot
+  workflow_dispatch:
+
+permissions:
+  contents: write   # commitar os PDFs compilados NESTE repositório
+
+concurrency:
+  group: publicacao-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REPO_PUBLICACAO: andradasdev/github
+
+jobs:
+  build-and-publish:
+    # Impede laço infinito: o commit de PDF do bot não dispara nova execução.
+    if: ${{ github.event.head_commit.author.name != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------
+      - name: Checkout do repositório
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0   # histórico completo: a lista de presença usa as datas dos commits
+
+      # ------------------------------------------------------------
+      - name: Gerar a lista de presença
+        run: python3 scripts/generate_presence_list.py
+
+      # ------------------------------------------------------------
+      # Lista derivada dos pacotes que os documentos realmente carregam.
+      #   texlive-publishers        -> abntex2.cls e abntex2-alf.bst
+      #   texlive-xetex             -> xelatex (a Lexend usa fontspec)
+      #   texlive-latex-extra       -> tcolorbox, csquotes, multirow
+      #   texlive-pictures          -> tikz e qrcode
+      #   texlive-lang-portuguese   -> hifenização pt-BR
+      #   texlive-fonts-recommended -> pzdr.tfm, que o hyperref usa nos links
+      - name: Instalar LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-base \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-pictures \
+            texlive-publishers \
+            texlive-xetex \
+            texlive-lang-portuguese \
+            texlive-fonts-recommended \
+            fonts-lmodern \
+            latexmk
+
+      # ------------------------------------------------------------
+      # Compila apenas documentos completos. Arquivos sem \documentclass
+      # (inclusões de pages/) são pulados.
+      - name: Compilar os documentos
+        working-directory: docs
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          compilados=0
+          for texfile in *.tex; do
+            if ! grep -q '\\documentclass' "$texfile"; then
+              echo "· pulando $texfile (não é um documento completo)"
+              continue
+            fi
+            echo "▸ compilando $texfile"
+            latexmk -xelatex -interaction=nonstopmode -halt-on-error "$texfile"
+            compilados=$((compilados + 1))
+          done
+          [ "$compilados" -gt 0 ] || { echo "::error::Nenhum documento compilado"; exit 1; }
+          echo "$compilados documento(s) compilado(s)"
+
+      # ------------------------------------------------------------
+      - name: Verificar a integridade dos PDFs
+        working-directory: docs
+        run: |
+          set -euo pipefail
+          falhou=0
+          for log in *.log; do
+            doc="${log%.log}"
+            [ -f "$doc.pdf" ] || { echo "::error::$doc.pdf não foi gerado"; falhou=1; continue; }
+            for padrao in 'Citation .* undefined' 'Reference .* undefined'; do
+              n=$(grep -cE "$padrao" "$log" || true)
+              if [ "$n" -gt 0 ]; then
+                echo "::error::$doc: $n ocorrência(s) de '$padrao'"
+                falhou=1
+              fi
+            done
+            echo "✓ $doc.pdf íntegro"
+          done
+          [ "$falhou" -eq 0 ]
+
+      # ------------------------------------------------------------
+      - name: Commitar os PDFs neste repositório
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/*.pdf
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração de PDF para commitar"
+            exit 0
+          fi
+          git commit -m "docs: atualizar PDFs compilados [skip ci]"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      # ============================================================
+      # ENVIO PARA O REPOSITÓRIO DE PUBLICAÇÃO
+      # ============================================================
+      # Só o que o público precisa: o guia, os slides de projeção e os
+      # materiais dos exercícios. A versão do apresentador
+      # (apresentacao_notes.pdf) NÃO vai: ela contém o roteiro da aula.
+      - name: Verificar se o token de publicação existe
+        env:
+          PUBLISH_TOKEN: ${{ secrets.TRAINING_ANDRADASDEV }}
+        run: |
+          if [ -z "${PUBLISH_TOKEN}" ]; then
+            echo "::error::O secret TRAINING_ANDRADASDEV não está configurado neste repositório."
+            echo "::error::Passo a passo: https://github.com/${REPO_PUBLICACAO}/blob/main/documentacao/autenticacao-github-actions.md"
+            exit 1
+          fi
+          echo "TRAINING_ANDRADASDEV presente"
+
+      - name: Enviar artefatos para ${{ env.REPO_PUBLICACAO }}
+        env:
+          PUBLISH_TOKEN: ${{ secrets.TRAINING_ANDRADASDEV }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 \
+            "https://x-access-token:${PUBLISH_TOKEN}@github.com/${REPO_PUBLICACAO}.git" \
+            /tmp/publicacao
+
+          mkdir -p /tmp/publicacao/docs /tmp/publicacao/materials
+          cp docs/guia.pdf          /tmp/publicacao/docs/
+          cp docs/apresentacao.pdf  /tmp/publicacao/docs/
+          cp materials/main.py materials/jogo-da-memoria.zip materials/modelo-actions.zip \
+             /tmp/publicacao/materials/
+
+          cd /tmp/publicacao
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs materials
+
+          if git diff --cached --quiet; then
+            echo "Artefatos idênticos aos publicados — nada a enviar"
+            exit 0
+          fi
+
+          git commit -m "publicar: artefatos de ${GITHUB_REPOSITORY}@${GITHUB_SHA:0:7}"
+          git push origin HEAD:main
+          echo "Artefatos enviados. O workflow de ${REPO_PUBLICACAO} publica o site."
