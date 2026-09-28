@@ -1,28 +1,54 @@
-% ----------------------------------------------------------------------------------------------------------------------
-% Pacotes essenciais para a escrita do trabalho acadêmico;
-% ----------------------------------------------------------------------------------------------------------------------
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% ----------------------------------------------------------------------
+% Preâmbulo — Capacitação de Git e GitHub
+% ----------------------------------------------------------------------
+% ATENÇÃO: compilar com XeLaTeX. A fonte Lexend é carregada de arquivos
+% locais em assets/fonts/, o que exige fontspec (XeLaTeX ou LuaLaTeX).
+% ----------------------------------------------------------------------
 \usepackage[brazil]{babel}
-\usepackage{lmodern}
+
+% --- Fonte da marca (Lexend, local) -----------------------------------
+\usepackage{fontspec}
+\newcommand{\fontpath}{./assets/fonts/}
+\setmainfont[
+    Path          = \fontpath,
+    UprightFont   = *-Regular,
+    BoldFont      = *-Bold,
+    AutoFakeSlant = 0.2,          % Lexend não possui itálico real
+]{Lexend}
+
+% --- Estrutura e tipografia -------------------------------------------
 \usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{color}
-\usepackage{xcolor}
-\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{csquotes}      % \enquote{...}: aspas no padrão brasileiro
 \usepackage{indentfirst}
-\usepackage{times}
-\usepackage{url}
-\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{float}
-\usepackage{listings}
-\usepackage{caption}
-\usepackage{subcaption}
+\usepackage{fancyhdr}
+
+% --- Tabelas -----------------------------------------------------------
 \usepackage{longtable}
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{array}
-\usepackage{fancyhdr}
-\usepackage{abntex2cite} % Citações padrão ABNT
-\usepackage{geometry}
+\usepackage{multirow}
+
+% --- Código ------------------------------------------------------------
+\usepackage{listings}
+
+% --- Símbolos usados nos avisos ---------------------------------------
+\usepackage{amssymb}
+\usepackage{pifont}
+
+% --- Caixas de destaque ------------------------------------------------
+\usepackage[most]{tcolorbox}
+
+% --- Links e citações --------------------------------------------------
 \usepackage{url}
+\usepackage{hyperref}
+\usepackage{abntex2cite}
+
+% --- Justificação -----------------------------------------------------
+% Nomes de comandos em \texttt{} são longos e não hifenizam, o que empurra
+% linhas para fora da margem. O emergencystretch autoriza o TeX a esticar
+% mais os espaços nesses parágrafos em vez de estourar a caixa.
+\setlength{\emergencystretch}{3em}
